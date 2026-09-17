@@ -42,22 +42,14 @@ export default function AdminLogin() {
             const data = await response.json();
 
             if (!response.ok || !data.success) {
-                throw new Error(
-                    data.message || "Login failed"
-                );
+                throw new Error(data.message || "Login failed");
             }
 
             // Save token
-            localStorage.setItem(
-                "adminToken",
-                data.token
-            );
+            localStorage.setItem("adminToken", data.data.token);
 
             // Save admin information
-            localStorage.setItem(
-                "admin",
-                JSON.stringify(data.data)
-            );
+            localStorage.setItem("admin", JSON.stringify(data.data.admin));
 
             navigate("/admin/dashboard");
 
