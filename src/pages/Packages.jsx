@@ -43,13 +43,13 @@ export default function Packages() {
         <div className="min-h-screen bg-gray-50">
             <Header />
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl font-bold text-[#253564] mb-2">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28">
+                {/* <h1 className="text-3xl font-bold text-[#253564] mb-2">
                     All Packages
-                </h1>
-                <p className="text-gray-600 mb-8">
+                </h1> */}
+                {/* <p className="text-gray-600 mb-8">
                     {packages.length} {packages.length === 1 ? "package" : "packages"} found
-                </p>
+                </p> */}
 
                 {/* Filters */}
                 <div className="bg-white rounded-lg border border-gray-200 p-4 mb-8 flex flex-wrap gap-3 items-center">

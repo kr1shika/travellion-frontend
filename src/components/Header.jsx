@@ -1,24 +1,23 @@
 import { Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import logo from "../assets/nobglogo.png";
 
 const Header = () => {
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // Configuration
+    // On any page other than home → treat as "scrolled" (solid header)
+    const isHomePage = location.pathname === '/';
+    const showSolidHeader = !isHomePage || isScrolled;
+
     const phoneNumber = "9842520169";
     const whatsappMessage = "Hello! I'm interested in studying abroad and would like to know more about your services.";
 
-    // Handle scroll event
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 50) {
-                setIsScrolled(true);
-            } else {
-                setIsScrolled(false);
-            }
+            setIsScrolled(window.scrollY > 50);
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -26,7 +25,9 @@ const Header = () => {
     }, []);
 
     return (
-        <header className={`fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+        <header className={`fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader
+                ? 'bg-white/95 backdrop-blur-md shadow-sm'
+                : 'bg-transparent'
             }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex justify-between items-center">
                 <Link to="/" className="flex items-center flex-shrink-0">
@@ -35,46 +36,42 @@ const Header = () => {
                         alt="Aaronic Logo"
                         className="h-8 sm:h-22 w-auto object-contain"
                     />
-                    {/* <span className={`ml-2 text-base sm:text-lg font-bold hidden sm:inline transition-colors duration-300 ${isScrolled ? 'text-[#253564]' : 'text-white'
-                        }`}>
-                        Aaronic
-                    </span> */}
                 </Link>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex gap-3 lg:gap-5 items-center">
                     <Link
                         to="/about"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${isScrolled
-                            ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                            : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
+                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
+                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
+                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
                             }`}
                     >
                         About
                     </Link>
                     <Link
                         to="/trek"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${isScrolled
-                            ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                            : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
+                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
+                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
+                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
                             }`}
                     >
                         Trek
                     </Link>
                     <Link
                         to="/tours"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${isScrolled
-                            ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                            : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
+                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
+                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
+                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
                             }`}
                     >
                         Tours
                     </Link>
                     <Link
                         to="/contact"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${isScrolled
-                            ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                            : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
+                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
+                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
+                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
                             }`}
                     >
                         Contact
@@ -85,9 +82,9 @@ const Header = () => {
                 <div className="hidden md:flex items-center gap-2 sm:gap-3">
                     <a
                         href={`tel:${phoneNumber}`}
-                        className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${isScrolled
-                            ? 'bg-[#253564] hover:bg-[#1a2448] text-white'
-                            : 'bg-white/10 backdrop-blur-sm hover:bg-[#253564] text-white border border-white/20 hover:border-transparent'
+                        className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${showSolidHeader
+                                ? 'bg-[#253564] hover:bg-[#1a2448] text-white'
+                                : 'bg-white/10 backdrop-blur-sm hover:bg-[#253564] text-white border border-white/20 hover:border-transparent'
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -100,9 +97,9 @@ const Header = () => {
                         href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${isScrolled
-                            ? 'bg-[#cd9d4e] hover:bg-[#b88d3e] text-white'
-                            : 'bg-white/10 backdrop-blur-sm hover:bg-[#cd9d4e] text-white border border-white/20 hover:border-transparent'
+                        className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${showSolidHeader
+                                ? 'bg-[#cd9d4e] hover:bg-[#b88d3e] text-white'
+                                : 'bg-white/10 backdrop-blur-sm hover:bg-[#cd9d4e] text-white border border-white/20 hover:border-transparent'
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -116,20 +113,24 @@ const Header = () => {
                 {/* Hamburger Menu Button - Mobile */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${isScrolled ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+                    className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${showSolidHeader ? 'hover:bg-gray-100' : 'hover:bg-white/10'
                         }`}
                     aria-label="Toggle menu"
                 >
-                    {isOpen ? <X size={24} className={isScrolled ? 'text-gray-700' : 'text-white'} /> : <Menu size={24} className={isScrolled ? 'text-gray-700' : 'text-white'} />}
+                    {isOpen ? (
+                        <X size={24} className={showSolidHeader ? 'text-gray-700' : 'text-white'} />
+                    ) : (
+                        <Menu size={24} className={showSolidHeader ? 'text-gray-700' : 'text-white'} />
+                    )}
                 </button>
             </div>
 
-            {/* Mobile Navigation - Slides down when open */}
+            {/* Mobile Navigation */}
             <div
                 className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
                     }`}
             >
-                <div className={`${isScrolled ? 'bg-white/95 backdrop-blur-md' : 'bg-white/95 backdrop-blur-md'} border-t ${isScrolled ? 'border-gray-100' : 'border-white/20'} px-4 py-4`}>
+                <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-4">
                     <div className="flex flex-col gap-2">
                         <Link
                             to="/"
@@ -167,7 +168,6 @@ const Header = () => {
                             Contact
                         </Link>
 
-                        {/* Mobile Action Buttons */}
                         <div className="flex gap-2 mt-2 pt-3 border-t border-gray-100">
                             <a
                                 href={`tel:${phoneNumber}`}
@@ -192,4 +192,3 @@ const Header = () => {
 };
 
 export default Header;
-

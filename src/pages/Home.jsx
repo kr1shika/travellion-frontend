@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import heroBg from "../assets/bg.jpg";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { publicFetch } from "../utils/api";
-
 const Home = () => {
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState("");
@@ -184,12 +184,12 @@ const Home = () => {
             {/* ============================================
                 CTA
             ============================================ */}
-            <section className="py-20 bg-[#253564]">
+            <section className="py-20 bg-[#c5d5e8]">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    <h2 className="text-3xl md:text-4xl font-bold text-[#093468] mb-4">
                         Ready to start your journey?
                     </h2>
-                    <p className="text-white/80 mb-8">
+                    <p className="text-[#093468]  mb-8">
                         Browse our full catalog of handpicked Himalayan adventures.
                     </p>
                     <Link
@@ -200,6 +200,8 @@ const Home = () => {
                     </Link>
                 </div>
             </section>
+            <Footer />
+
         </div>
     );
 };
@@ -263,6 +265,7 @@ function PackageCard({ pkg }) {
                     </div>
                 </div>
             </div>
+
         </Link>
     );
 }

@@ -1,15 +1,15 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+import AdminLayout from "./components/AdminLayout";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminInquiries from "./pages/admin/AdminInquiries";
 import AdminItineraries from "./pages/admin/AdminItineraries";
 import AdminItineraryForm from "./pages/admin/AdminItineraryForm";
+import BookingPage from "./pages/BookingPage";
 import Home from "./pages/Home";
 import PackageDetail from "./pages/PackageDetail";
 import Packages from "./pages/Packages";
-
-import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
-import AdminLayout from "./components/AdminLayout";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -27,6 +27,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/packages/:slug" element={<PackageDetail />} />
+        <Route path="/packages/:slug/book" element={<BookingPage />} />
 
         {/* ============================================
             ADMIN AUTH
@@ -56,6 +57,7 @@ function App() {
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="customers" element={<AdminCustomers />} />
           <Route path="inquiries" element={<AdminInquiries />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

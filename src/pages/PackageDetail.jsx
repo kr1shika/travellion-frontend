@@ -57,7 +57,7 @@ export default function PackageDetail() {
         return (
             <div className="min-h-screen bg-white">
                 <Header />
-                <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+                <div className="max-w-2xl mx-auto px-4 py-19 text-center">
                     <h1 className="text-2xl font-bold text-[#253564] mb-3">
                         Package not found
                     </h1>
@@ -89,7 +89,7 @@ export default function PackageDetail() {
                 GALLERY
             ============================================ */}
             <section className="bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-27 pb-4">
                     {/* Breadcrumb */}
                     <div className="text-xs text-gray-500 mb-4">
                         <Link to="/" className="hover:text-[#cd9d4e]">
@@ -127,11 +127,10 @@ export default function PackageDetail() {
                                     <button
                                         key={i}
                                         onClick={() => setActiveImage(img.url)}
-                                        className={`aspect-[16/10] rounded-lg overflow-hidden border-2 transition ${
-                                            activeImage === img.url
+                                        className={`aspect-[16/10] rounded-lg overflow-hidden border-2 transition ${activeImage === img.url
                                                 ? "border-[#cd9d4e]"
                                                 : "border-transparent hover:border-gray-300"
-                                        }`}
+                                            }`}
                                     >
                                         <img
                                             src={img.url}
