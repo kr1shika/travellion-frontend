@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { publicFetch } from "../utils/api";
-
 export default function RequestBookingPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -253,9 +253,9 @@ export default function RequestBookingPage() {
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="text-center mb-12">
-                    <p className="text-[#cd9d4e] uppercase tracking-widest text-xs font-semibold mb-3">
+                    {/* <p className="text-[#cd9d4e] uppercase tracking-widest text-xs font-semibold mb-3">
                         Send a Request
-                    </p>
+                    </p> */}
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#253564]">
                         Request Booking
                     </h1>
@@ -474,6 +474,7 @@ export default function RequestBookingPage() {
                     </div>
                 </form>
             </div>
+            <Footer />
         </div>
     );
 }
