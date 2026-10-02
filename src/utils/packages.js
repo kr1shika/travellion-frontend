@@ -8,8 +8,8 @@
 // export const fetchActivities   = () => API.get('/packages/activities').then(r => r.data);
 // export const fetchPackages     = (params) => API.get('/packages', { params }).then(r => r.data);
 
-const API_URL = "http://localhost:5000/api";
-
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 async function getJSON(url) {
     const res = await fetch(url);
     const json = await res.json();

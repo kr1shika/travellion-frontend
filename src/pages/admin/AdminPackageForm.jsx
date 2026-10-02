@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { adminFetch } from "../../utils/adminFetch";
 
-const API_URL = "http://localhost:5000/api";
-
+const API_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function AdminPackageForm() {
     const navigate = useNavigate();
     const { id } = useParams();
