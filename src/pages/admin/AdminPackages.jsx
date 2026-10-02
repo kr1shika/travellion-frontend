@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useConfirm } from "../../components/ConfirmContext";
+import { useToast } from "../../components/ToastContext";
 import { adminFetch } from "../../utils/adminFetch";
 
 export default function AdminPackages() {
+    const confirm = useConfirm();
+
+    const toast = useToast();
+
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -12,10 +18,14 @@ export default function AdminPackages() {
             setLoading(true);
             const { data } = await adminFetch("/packages/admin/all?limit=100");
             if (data.success) {
+                // toast.success("Action Sucess");
+
                 setPackages(data.data);
             }
         } catch (err) {
-            setError(err.message);
+            toast.error(err.message);
+
+            // setError(err.message);
         } finally {
             setLoading(false);
         }
@@ -25,16 +35,29 @@ export default function AdminPackages() {
         fetchPackages();
     }, []);
 
-    const handleDelete = async (id) => {
-        if (!window.confirm("Delete this package?")) return;
-        const { data } = await adminFetch(`/packages/${id}`, {
-            method: "DELETE",
+    const handleDelete = async (id, name) => {
+        const ok = await confirm({
+            title: "Delete this package?",
+            message: `Selected package and all its images, itinerary will be permanently deleted. This cannot be undone.`,
+            confirmText: "Delete",
+            variant: "danger",
         });
-        if (data.success) {
-            setPackages(packages.filter((p) => p._id !== id));
+        if (!ok) return;
+
+        try {
+            const { data } = await adminFetch(`/packages/${id}`, {
+                method: "DELETE",
+            });
+            if (data.success) {
+                setPackages(packages.filter((p) => p._id !== id));
+                toast.success("Package deleted successfully");
+            } else {
+                toast.error(data.message || "Failed to delete package");
+            }
+        } catch (err) {
+            toast.error(err.message);
         }
     };
-
     return (
         <>
             {/* Header */}
@@ -122,10 +145,10 @@ export default function AdminPackages() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-sm text-slate-600">
-                                        {pkg.duration?.days} days
+                                        {pkg.durationDays} days
                                     </td>
                                     <td className="px-6 py-4 text-sm text-slate-600">
-                                        ${pkg.price?.usd}
+                                        ${pkg.priceUsd}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span
@@ -141,7 +164,7 @@ export default function AdminPackages() {
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-3">
                                         <Link
-                                            to={`/admin/packages/edit/${pkg._id}`}
+                                            to={`/admin/packages/edit/${pkg.id || pkg._id}`}
                                             className="text-sm font-semibold text-slate-700 hover:text-slate-900"
                                         >
                                             Edit

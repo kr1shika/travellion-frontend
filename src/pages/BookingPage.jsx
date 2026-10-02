@@ -1,9 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { publicFetch } from "../utils/api";
+
 export default function RequestBookingPage() {
     const { slug } = useParams();
     const navigate = useNavigate();
@@ -46,12 +46,11 @@ export default function RequestBookingPage() {
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
-    const pricePerPerson = pkg?.price?.usd || 0;
+    // --- flat field names from Sequelize ---
+    const pricePerPerson = Number(pkg?.priceUsd) || 0;
     const numberOfPeople = Number(form.numberOfPeople) || 1;
     const subtotal = pricePerPerson * numberOfPeople;
     const depositAmount = Math.round(subtotal * 0.2);
-    const bankCharge = Math.round(depositAmount * 0.035);
-    const payableAmount = depositAmount + bankCharge;
     const dueAmount = subtotal - depositAmount;
 
     const handleSubmit = async (e) => {
@@ -88,14 +87,17 @@ export default function RequestBookingPage() {
                 );
             }
 
-            const customerId = customerRes.data.data._id;
+            // --- customer id: Sequelize returns `id`, not `_id` ---
+            const customerId =
+                customerRes.data.data.id || customerRes.data.data._id;
 
-            // 2. Create booking as PENDING (request, not confirmed)
+            // 2. Create booking as PENDING
             const bookingRes = await publicFetch("/bookings", {
                 method: "POST",
                 body: JSON.stringify({
                     customerId,
-                    packageId: pkg._id,
+                    // --- package id: flat field ---
+                    packageId: pkg.id || pkg._id,
                     travelDate: form.travelDate,
                     numberOfPeople,
                     specialRequests: form.specialRequests,
@@ -109,23 +111,26 @@ export default function RequestBookingPage() {
                 );
             }
 
-            // 3. Notify admin via email (fire and forget)
+            // 3. Notify admin via email
+            const bookingId =
+                bookingRes.data.data.id || bookingRes.data.data._id;
+
             try {
                 await publicFetch("/bookings/notify-admin", {
                     method: "POST",
                     body: JSON.stringify({
-                        bookingId: bookingRes.data.data._id,
+                        bookingId,
                         packageName: pkg.name,
                         customerName: form.fullName,
                         customerEmail: form.email,
                         customerPhone: form.phone,
+                        customerCountry: form.country,
                         travelDate: form.travelDate,
                         numberOfPeople,
                         specialRequests: form.specialRequests,
                     }),
                 });
             } catch (notifyErr) {
-                // Don't block the user if email fails
                 console.error("Admin notify failed:", notifyErr);
             }
 
@@ -251,11 +256,7 @@ export default function RequestBookingPage() {
             <Header />
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
                 <div className="text-center mb-12">
-                    {/* <p className="text-[#cd9d4e] uppercase tracking-widest text-xs font-semibold mb-3">
-                        Send a Request
-                    </p> */}
                     <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#253564]">
                         Request Booking
                     </h1>
@@ -276,7 +277,6 @@ export default function RequestBookingPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                         {/* LEFT — FORM */}
                         <div className="lg:col-span-2 space-y-8">
-                            {/* Top row */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div className="flex items-center gap-4">
                                     <label className="text-sm text-gray-600 whitespace-nowrap">
@@ -306,7 +306,6 @@ export default function RequestBookingPage() {
                                 </div>
                             </div>
 
-                            {/* Traveller info */}
                             <div>
                                 <h2 className="text-2xl font-bold text-[#253564] mb-6">
                                     Traveller Info
@@ -354,7 +353,6 @@ export default function RequestBookingPage() {
                                 </div>
                             </div>
 
-                            {/* Requirements */}
                             <div>
                                 <h2 className="text-2xl font-bold text-[#253564] mb-2">
                                     Your Specific Requirements
@@ -388,7 +386,7 @@ export default function RequestBookingPage() {
                                     <SummaryRow
                                         icon="clock"
                                         label="Duration"
-                                        value={`${pkg.duration?.days} Days`}
+                                        value={`${pkg.durationDays} Days`}
                                     />
                                     <SummaryRow
                                         icon="calendar"

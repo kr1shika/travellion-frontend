@@ -1,14 +1,37 @@
-import { Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import logo from "../assets/nobglogo.png";
+import { fetchActivities, fetchDestinations, fetchPackages } from '../utils/packages';
 
 const Header = () => {
     const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
 
-    // On any page other than home → treat as "scrolled" (solid header)
+    // Dropdown state
+    const [openMenu, setOpenMenu] = useState(null); // 'destination' | 'activities' | null
+    const [destinations, setDestinations] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [activeDestination, setActiveDestination] = useState(null);
+    const [destinationPackages, setDestinationPackages] = useState([]);
+    const [loadingPackages, setLoadingPackages] = useState(false);
+    useEffect(() => {
+        fetchDestinations()
+            .then((data) => {
+                setDestinations(data || []);
+                // Auto-select the first destination for the two-panel dropdown
+                if (data && data.length > 0) {
+                    handleDestinationClick(data[0].destination);
+                }
+            })
+            .catch((err) => console.error("Destinations failed:", err));
+
+        fetchActivities()
+            .then((data) => setActivities(data || []))
+            .catch((err) => console.error("Activities failed:", err));
+    }, []);
+
     const isHomePage = location.pathname === '/';
     const showSolidHeader = !isHomePage || isScrolled;
 
@@ -16,75 +39,194 @@ const Header = () => {
     const whatsappMessage = "Hello! I'm interested in studying abroad and would like to know more about your services.";
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        setOpenMenu(null);
+        setIsOpen(false);
+        setActiveDestination(null);
+    }, [location.pathname]);
+
+    // useEffect(() => {
+    //     if (openMenu === 'destination' && destinations.length === 0) {
+    //         fetchDestinations().then(setDestinations).catch(console.error);
+    //     }
+    //     if (openMenu === 'activities' && activities.length === 0) {
+    //         fetchActivities().then(setActivities).catch(console.error);
+    //     }
+    // }, [openMenu]);
+
+    // Auto-select first destination when dropdown opens
+    // useEffect(() => {
+    //     if (
+    //         openMenu === 'destination' &&
+    //         destinations.length > 0 &&
+    //         !activeDestination
+    //     ) {
+    //         handleDestinationClick(destinations[0].destination);
+    //     }
+    // }, [openMenu, destinations]);
+ const handleDestinationClick = async (dest) => {
+    setActiveDestination(dest);
+    setLoadingPackages(true);
+    try {
+        const packages = await fetchPackages({ destination: dest, limit: 8 });
+        setDestinationPackages(Array.isArray(packages) ? packages : []);
+    } catch (err) {
+        console.error("Packages fetch failed:", err);
+        setDestinationPackages([]);
+    } finally {
+        setLoadingPackages(false);
+    }
+};
+
+    const navLinkClass = `text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
+        ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
+        : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
+        }`;
+
     return (
-        <header className={`fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader
-                ? 'bg-white/95 backdrop-blur-md shadow-sm'
-                : 'bg-transparent'
+        <header className={`fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
             }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex justify-between items-center">
                 <Link to="/" className="flex items-center flex-shrink-0">
-                    <img
-                        src={logo}
-                        alt="Aaronic Logo"
-                        className="h-8 sm:h-22 w-auto object-contain"
-                    />
+                    <img src={logo} alt="Aaronic Logo" className="h-8 sm:h-22 w-auto object-contain" />
                 </Link>
 
                 {/* Desktop Navigation */}
                 <nav className="hidden md:flex gap-3 lg:gap-5 items-center">
-                    <Link
-                        to="/about"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
-                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
-                            }`}
-                    >
-                        About
-                    </Link>
-                    <Link
-                        to="/trek"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
-                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
-                            }`}
-                    >
-                        Trek
-                    </Link>
-                    <Link
-                        to="/tours"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
-                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
-                            }`}
-                    >
-                        Tours
-                    </Link>
-                    <Link
-                        to="/contact"
-                        className={`text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
-                                ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
-                                : 'text-white hover:text-[#cd9d4e] hover:bg-white/10'
-                            }`}
-                    >
-                        Contact
-                    </Link>
+                    <Link to="/about" className={navLinkClass}>About Us</Link>
+
+                    {/* ===== DESTINATION DROPDOWN (two-panel) ===== */}
+                    <div className="relative group">
+                        <button className={`${navLinkClass} flex items-center gap-1`}>
+                            Destinations <ChevronDown size={14} className="transition-transform group-hover:rotate-180" />
+                        </button>
+
+                        {/* Popup */}
+                        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[780px] max-w-[92vw] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex z-50">
+                            {/* Left: Destination list */}
+                            <div className="w-[260px] bg-[#f5f5f5] py-6 px-5 flex-shrink-0 max-h-[460px] overflow-y-auto">
+                                <p className="text-[11px] font-semibold tracking-[0.15em] text-gray-500 uppercase mb-4">
+                                    Destinations
+                                </p>
+                                <ul className="flex flex-col gap-1">
+                                    {destinations.length === 0 && (
+                                        <li className="text-sm text-gray-400 px-2">Loading…</li>
+                                    )}
+                                    {destinations.map((d) => {
+                                        const isActive = activeDestination === d.destination;
+                                        return (
+                                            <li key={d.destination}>
+                                                <button
+                                                    onClick={() => handleDestinationClick(d.destination)}
+                                                    className={`w-full text-left text-sm px-3 py-2 rounded-md transition-colors ${isActive
+                                                        ? 'text-[#cd9d4e] font-semibold'
+                                                        : 'text-gray-600 hover:text-[#253564] hover:bg-white'
+                                                        }`}
+                                                >
+                                                    {d.destination}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </div>
+
+                            {/* Right: Packages for active destination */}
+                            <div className="flex-1 py-6 px-7 max-h-[460px] overflow-y-auto">
+                                <p className="text-[11px] font-semibold tracking-[0.15em] text-gray-700 uppercase mb-5">
+                                    {activeDestination ? `${activeDestination} Packages` : 'Select a destination'}
+                                </p>
+
+                                {loadingPackages && (
+                                    <p className="text-sm text-gray-400">Loading…</p>
+                                )}
+
+                                {!loadingPackages && activeDestination && destinationPackages.length === 0 && (
+                                    <p className="text-sm text-gray-400">No packages found.</p>
+                                )}
+
+                                {!loadingPackages && destinationPackages.length > 0 && (
+                                    <div className="grid grid-cols-2 gap-5">
+                                        {destinationPackages.map((p) => (
+                                            <Link
+                                                key={p.id || p.slug}
+                                                to={`/packages/${p.slug}`}
+                                                className="group/card"
+                                            >
+                                                <div className="w-full h-[140px] rounded-lg overflow-hidden bg-gray-100">
+                                                    {p.featuredImage ? (
+                                                        <img
+                                                            src={p.featuredImage}
+                                                            alt={p.name}
+                                                            className="w-full h-full object-cover group-hover/card:scale-105 transition-transform duration-300"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">
+                                                            No image
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="mt-2.5 text-sm font-medium text-gray-800 group-hover/card:text-[#cd9d4e] transition-colors line-clamp-1">
+                                                    {p.name}
+                                                </p>
+                                                <p className="text-xs text-gray-500 mt-0.5">
+                                                    {p.durationDays} days · ${p.priceUsd}
+                                                </p>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ===== ACTIVITIES DROPDOWN ===== */}
+                    <div className="relative group">
+                        <button className={`${navLinkClass} flex items-center gap-1`}>
+                            Activities <ChevronDown size={14} className="transition-transform group-hover:rotate-180" />
+                        </button>
+
+                        {/* Popup */}
+                        <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                            <div className="py-5 px-4 max-h-[420px] overflow-y-auto">
+                                <p className="text-[11px] font-semibold tracking-[0.15em] text-gray-500 uppercase mb-3 px-2">
+                                    Activities
+                                </p>
+                                {activities.length === 0 && (
+                                    <p className="text-sm text-gray-400 px-2">Loading…</p>
+                                )}
+                                <ul className="flex flex-col gap-1">
+                                    {activities.map((a) => (
+                                        <li key={a.activity}>
+                                            <Link
+                                                to={`/packages?activity=${encodeURIComponent(a.activity)}`}
+                                                className="flex justify-between items-center px-3 py-2 rounded-md text-sm text-gray-600 hover:text-[#cd9d4e] hover:bg-gray-50 transition"
+                                            >
+                                                <span>{a.activity}</span>
+                                                <span className="text-xs text-gray-400">{a.count}</span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Link to="/contact" className={navLinkClass}>Contact Us</Link>
                 </nav>
 
-                {/* Desktop Action Buttons */}
+                {/* Desktop Action Buttons (unchanged) */}
                 <div className="hidden md:flex items-center gap-2 sm:gap-3">
                     <a
                         href={`tel:${phoneNumber}`}
                         className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${showSolidHeader
-                                ? 'bg-[#253564] hover:bg-[#1a2448] text-white'
-                                : 'bg-white/10 backdrop-blur-sm hover:bg-[#253564] text-white border border-white/20 hover:border-transparent'
+                            ? 'bg-[#253564] hover:bg-[#1a2448] text-white'
+                            : 'bg-white/10 backdrop-blur-sm hover:bg-[#253564] text-white border border-white/20 hover:border-transparent'
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -98,8 +240,8 @@ const Header = () => {
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1 rounded-full transition-all duration-200 text-xs font-medium whitespace-nowrap shadow-sm hover:shadow-md ${showSolidHeader
-                                ? 'bg-[#cd9d4e] hover:bg-[#b88d3e] text-white'
-                                : 'bg-white/10 backdrop-blur-sm hover:bg-[#cd9d4e] text-white border border-white/20 hover:border-transparent'
+                            ? 'bg-[#cd9d4e] hover:bg-[#b88d3e] text-white'
+                            : 'bg-white/10 backdrop-blur-sm hover:bg-[#cd9d4e] text-white border border-white/20 hover:border-transparent'
                             }`}
                     >
                         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -110,7 +252,7 @@ const Header = () => {
                     </a>
                 </div>
 
-                {/* Hamburger Menu Button - Mobile */}
+                {/* Mobile Hamburger */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className={`md:hidden p-2 rounded-lg transition-colors duration-200 ${showSolidHeader ? 'hover:bg-gray-100' : 'hover:bg-white/10'
@@ -125,62 +267,59 @@ const Header = () => {
                 </button>
             </div>
 
-            {/* Mobile Navigation */}
+            {/* Mobile Navigation (unchanged) */}
             <div
-                className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'
+                className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[90vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0'
                     }`}
             >
                 <div className="bg-white/95 backdrop-blur-md border-t border-gray-100 px-4 py-4">
-                    <div className="flex flex-col gap-2">
-                        <Link
-                            to="/"
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
-                        >
+                    <div className="flex flex-col gap-1">
+                        <Link to="/" onClick={() => setIsOpen(false)}
+                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition">
                             Home
                         </Link>
-                        <Link
-                            to="/about"
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
-                        >
-                            About
+                        <Link to="/about" onClick={() => setIsOpen(false)}
+                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition">
+                            About Us
                         </Link>
-                        <Link
-                            to="/trek"
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
-                        >
-                            Trek
-                        </Link>
-                        <Link
-                            to="/tours"
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
-                        >
-                            Tours
-                        </Link>
-                        <Link
-                            to="/contact"
-                            onClick={() => setIsOpen(false)}
-                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
-                        >
-                            Contact
+
+                        <MobileDropdown
+                            label="Destinations"
+                            items={destinations.map(d => ({ key: d.destination, label: d.destination, count: d.count }))}
+                            itemLink={(item) => `/packages?destination=${encodeURIComponent(item.key)}`}
+                            onItemClick={() => setIsOpen(false)}
+                            onOpen={() => {
+                                if (destinations.length === 0) {
+                                    fetchDestinations().then(setDestinations).catch(console.error);
+                                }
+                            }}
+                        />
+
+                        <MobileDropdown
+                            label="Activities"
+                            items={activities.map(a => ({ key: a.activity, label: a.activity, count: a.count }))}
+                            itemLink={(item) => `/packages?activity=${encodeURIComponent(item.key)}`}
+                            onItemClick={() => setIsOpen(false)}
+                            onOpen={() => {
+                                if (activities.length === 0) {
+                                    fetchActivities().then(setActivities).catch(console.error);
+                                }
+                            }}
+                        />
+
+                        <Link to="/contact" onClick={() => setIsOpen(false)}
+                            className="text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition">
+                            Contact Us
                         </Link>
 
                         <div className="flex gap-2 mt-2 pt-3 border-t border-gray-100">
-                            <a
-                                href={`tel:${phoneNumber}`}
-                                className="flex-1 bg-[#253564] hover:bg-[#1a2448] text-white text-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-                            >
+                            <a href={`tel:${phoneNumber}`}
+                                className="flex-1 bg-[#253564] hover:bg-[#1a2448] text-white text-center px-3 py-2.5 rounded-lg text-sm font-medium transition">
                                 Call Now
                             </a>
-                            <a
-                                href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-1 bg-[#cd9d4e] hover:bg-[#b88d3e] text-white text-center px-3 py-2.5 rounded-lg text-sm font-medium transition"
-                            >
+                            <a href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`}
+                                target="_blank" rel="noopener noreferrer"
+                                className="flex-1 bg-[#cd9d4e] hover:bg-[#b88d3e] text-white text-center px-3 py-2.5 rounded-lg text-sm font-medium transition">
                                 WhatsApp
                             </a>
                         </div>
@@ -188,6 +327,45 @@ const Header = () => {
                 </div>
             </div>
         </header>
+    );
+};
+
+/* Mobile accordion sub-component */
+const MobileDropdown = ({ label, items, itemLink, onItemClick, onOpen }) => {
+    const [open, setOpen] = useState(false);
+    const toggle = () => {
+        const next = !open;
+        setOpen(next);
+        if (next && onOpen) onOpen();
+    };
+    return (
+        <div>
+            <button
+                onClick={toggle}
+                className="w-full flex justify-between items-center text-gray-700 text-sm font-medium hover:text-[#cd9d4e] hover:bg-gray-50 px-3 py-2 rounded-lg transition"
+            >
+                {label}
+                <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+            </button>
+            {open && (
+                <div className="pl-4 mt-1 flex flex-col">
+                    {items.length === 0 && (
+                        <span className="text-xs text-gray-400 px-3 py-1">Loading…</span>
+                    )}
+                    {items.map((item) => (
+                        <Link
+                            key={item.key}
+                            to={itemLink(item)}
+                            onClick={onItemClick}
+                            className="flex justify-between items-center text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 hover:text-[#cd9d4e]"
+                        >
+                            <span>{item.label}</span>
+                            <span className="text-xs text-gray-400">{item.count}</span>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
     );
 };
 

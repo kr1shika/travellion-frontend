@@ -6,13 +6,14 @@ const API_URL = "http://localhost:5000/api";
 
 export default function AdminPackageForm() {
     const navigate = useNavigate();
-    const { id } = useParams(); // present when editing
+    const { id } = useParams();
     const isEdit = Boolean(id);
     const [searchParams] = useSearchParams();
     const itineraryRef = useRef(null);
 
     const [form, setForm] = useState({
         name: "",
+        destination: "",          // ← NEW
         category: "Trekking",
         priceUsd: "",
         priceNpr: "",
@@ -36,7 +37,7 @@ export default function AdminPackageForm() {
 
     const [highlights, setHighlights] = useState([""]);
     const [exclusions, setExclusions] = useState([""]);
-    const [images, setImages] = useState([]); // { url, caption, alt, isFeatured, order }
+    const [images, setImages] = useState([]);
     const [itinerary, setItinerary] = useState([]);
 
     const [uploading, setUploading] = useState(false);
@@ -53,15 +54,16 @@ export default function AdminPackageForm() {
                 const p = data.data;
                 setForm({
                     name: p.name || "",
+                    destination: p.destination || "",
                     category: p.category || "Trekking",
-                    priceUsd: p.price?.usd || "",
-                    priceNpr: p.price?.npr || "",
-                    durationDays: p.duration?.days || "",
-                    durationNights: p.duration?.nights || "",
+                    priceUsd: p.priceUsd ?? "",
+                    priceNpr: p.priceNpr ?? "",
+                    durationDays: p.durationDays ?? "",
+                    durationNights: p.durationNights ?? "",
                     country: p.country || "Nepal",
                     region: p.region || "",
-                    maxAltitudeMeters: p.maxAltitude?.meters || "",
-                    maxAltitudeFeet: p.maxAltitude?.feet || "",
+                    maxAltitudeMeters: p.maxAltitudeMeters ?? "",
+                    maxAltitudeFeet: p.maxAltitudeFeet ?? "",
                     difficulty: p.difficulty || "Moderate",
                     activity: p.activity || "Trekking/Hiking",
                     seasonDisplay: p.seasonDisplay || "",
@@ -80,6 +82,7 @@ export default function AdminPackageForm() {
             }
         })();
     }, [id]);
+
     useEffect(() => {
         if (
             searchParams.get("focus") === "itinerary" &&
@@ -116,7 +119,6 @@ export default function AdminPackageForm() {
         try {
             const formData = new FormData();
             Array.from(files).forEach((f) => formData.append("images", f));
-            // No packageId — this is a new package
 
             const token = localStorage.getItem("adminToken");
             const res = await fetch(`${API_URL}/images/upload-multiple`, {
@@ -128,7 +130,6 @@ export default function AdminPackageForm() {
 
             if (!data.success) throw new Error(data.message);
 
-            // Keep the full image object (including _id) so backend can link it later
             setImages((prev) => [
                 ...prev,
                 ...data.data.map((img, i) => ({
@@ -192,52 +193,48 @@ export default function AdminPackageForm() {
         try {
             const payload = {
                 name: form.name,
-
+                destination: form.destination,
                 category: form.category,
-                price: {
-                    usd: Number(form.priceUsd),
-                    npr: form.priceNpr ? Number(form.priceNpr) : undefined,
-                },
-                duration: {
-                    days: Number(form.durationDays),
-                    nights: form.durationNights
-                        ? Number(form.durationNights)
-                        : undefined,
-                },
+
+                // FLAT — matches Sequelize columns
+                priceUsd: Number(form.priceUsd),
+                priceNpr: form.priceNpr ? Number(form.priceNpr) : null,
+
+                durationDays: Number(form.durationDays),
+                durationNights: form.durationNights ? Number(form.durationNights) : null,
+
                 country: form.country,
                 region: form.region,
-                maxAltitude: {
-                    meters: form.maxAltitudeMeters
-                        ? Number(form.maxAltitudeMeters)
-                        : undefined,
-                    feet: form.maxAltitudeFeet
-                        ? Number(form.maxAltitudeFeet)
-                        : undefined,
-                },
+                maxAltitudeMeters: form.maxAltitudeMeters ? Number(form.maxAltitudeMeters) : null,
+                maxAltitudeFeet: form.maxAltitudeFeet ? Number(form.maxAltitudeFeet) : null,
+
                 difficulty: form.difficulty,
                 activity: form.activity,
                 seasonDisplay: form.seasonDisplay,
                 accommodation: form.accommodation,
                 mealsIncluded: form.mealsIncluded,
+
                 overview: form.overview,
                 description: form.description,
                 status: form.status,
                 isFeatured: form.isFeatured,
                 isPopular: form.isPopular,
+
                 highlights: highlights.filter((h) => h.trim()),
                 exclusions: exclusions.filter((e) => e.trim()),
+
                 images,
                 itinerary: itinerary.map((it, i) => ({
-                    ...it,
                     day: i + 1,
-                    altitude: {
-                        meters: it.altitude?.meters
-                            ? Number(it.altitude.meters)
-                            : undefined,
-                        feet: it.altitude?.feet
-                            ? Number(it.altitude.feet)
-                            : undefined,
-                    },
+                    title: it.title,
+                    description: it.description,
+                    distance: it.distance || "",
+                    altitudeMeters: it.altitude?.meters ? Number(it.altitude.meters) : null,
+                    altitudeFeet: it.altitude?.feet ? Number(it.altitude.feet) : null,
+                    accommodation: it.accommodation || "",
+                    mealsBreakfast: it.meals?.breakfast ?? true,
+                    mealsLunch: it.meals?.lunch ?? true,
+                    mealsDinner: it.meals?.dinner ?? true,
                 })),
             };
 
@@ -276,6 +273,14 @@ export default function AdminPackageForm() {
                 {/* BASIC INFO */}
                 <Section title="Basic Info">
                     <Input label="Name" name="name" value={form.name} onChange={handleChange} required />
+                    <Input
+                        label="Destination"
+                        name="destination"
+                        value={form.destination}
+                        onChange={handleChange}
+                        placeholder="e.g., Everest Base Camp"
+                        required
+                    />
                     <Select label="Category" name="category" value={form.category} onChange={handleChange}
                         options={["Trekking", "Hiking", "Tour", "Expedition", "Adventure"]} />
                     <Select label="Difficulty" name="difficulty" value={form.difficulty} onChange={handleChange}
@@ -390,7 +395,6 @@ export default function AdminPackageForm() {
 
                 {/* ITINERARY */}
                 <div ref={itineraryRef}>
-
                     <Section title="Itinerary">
                         {itinerary.map((day, i) => (
                             <div key={i} className="border border-slate-200 rounded-lg p-4 space-y-3 bg-slate-50">
@@ -424,7 +428,6 @@ export default function AdminPackageForm() {
                             className="text-sm text-slate-700 underline">+ Add day</button>
                     </Section>
                 </div>
-
 
                 {/* SUBMIT */}
                 <div className="flex gap-3">

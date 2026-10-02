@@ -1,7 +1,729 @@
+
+// import { useEffect, useState } from "react";
+
+// import {
+//     Calendar,
+//     Check,
+//     Clock,
+//     Coffee,
+//     Compass,
+//     Footprints,
+//     Home,
+//     Info,
+//     Mail,
+//     MapPin,
+//     Moon,
+//     Mountain,
+//     Phone,
+//     Users,
+//     Utensils,
+//     X,
+// } from "lucide-react";
+// import { Link, useNavigate, useParams } from "react-router-dom";
+// import Footer from "../components/Footer";
+// import Header from "../components/Header";
+// import { publicFetch } from "../utils/api";
+
+// // ============================================
+// // Normalizer — flatten Sequelize fields to nested shape
+// // ============================================
+// function normalizePackage(pkg) {
+//     if (!pkg || typeof pkg !== "object") return null;
+
+//     const toBool = (v) => v === true || v === 1 || v === "true";
+
+//     return {
+//         ...pkg,
+//         price: {
+//             usd: pkg.priceUsd ?? null,
+//             npr: pkg.priceNpr ?? null,
+//         },
+//         duration: {
+//             days: pkg.durationDays ?? null,
+//             nights: pkg.durationNights ?? null,
+//         },
+//         maxAltitude: {
+//             meters: pkg.maxAltitudeMeters ?? null,
+//             feet: pkg.maxAltitudeFeet ?? null,
+//         },
+//         images: Array.isArray(pkg.images) ? pkg.images : [],
+//         itinerary: Array.isArray(pkg.itinerary)
+//             ? pkg.itinerary.map((it) => ({
+//                 ...it,
+//                 altitude: {
+//                     meters: it.altitudeMeters ?? null,
+//                     feet: it.altitudeFeet ?? null,
+//                 },
+//                 meals: {
+//                     breakfast: toBool(it.mealsBreakfast),
+//                     lunch: toBool(it.mealsLunch),
+//                     dinner: toBool(it.mealsDinner),
+//                 },
+//             }))
+//             : [],
+//         highlights: Array.isArray(pkg.highlights) ? pkg.highlights : [],
+//         exclusions: Array.isArray(pkg.exclusions) ? pkg.exclusions : [],
+//         inclusions: Array.isArray(pkg.inclusions) ? pkg.inclusions : [],
+//         faqs: Array.isArray(pkg.faqs) ? pkg.faqs : [],
+//     };
+// }
+
+// export default function PackageDetail() {
+//     const { slug } = useParams();
+//     const navigate = useNavigate();
+
+//     const [pkg, setPkg] = useState(null);
+//     const [loading, setLoading] = useState(true);
+//     const [error, setError] = useState("");
+//     const [activeImage, setActiveImage] = useState(null);
+
+//     // ----------------------------------------
+//     // Fetch package
+//     // ----------------------------------------
+//     useEffect(() => {
+//         let cancelled = false;
+
+//         (async () => {
+//             try {
+//                 setLoading(true);
+//                 setError("");
+
+//                 const { data } = await publicFetch(`/packages/${slug}`);
+
+//                 if (!data?.success) {
+//                     throw new Error(data?.message || "Package not found");
+//                 }
+//                 if (!data.data) {
+//                     throw new Error("Package data is empty");
+//                 }
+
+//                 const normalized = normalizePackage(data.data);
+//                 if (!normalized) {
+//                     throw new Error("Could not parse package data");
+//                 }
+
+//                 if (cancelled) return;
+
+//                 setPkg(normalized);
+
+//                 const featured =
+//                     normalized.images.find((img) => img.isFeatured) ||
+//                     normalized.images[0];
+//                 setActiveImage(featured?.url || null);
+//             } catch (err) {
+//                 if (!cancelled) setError(err.message);
+//             } finally {
+//                 if (!cancelled) setLoading(false);
+//             }
+//         })();
+
+//         return () => {
+//             cancelled = true;
+//         };
+//     }, [slug]);
+
+//     // ----------------------------------------
+//     // Loading
+//     // ----------------------------------------
+//     if (loading) {
+//         return (
+//             <div className="min-h-screen bg-white">
+//                 <Header />
+//                 <div className="max-w-7xl mx-auto px-4 py-16">
+//                     <p className="text-gray-500">Loading package...</p>
+//                 </div>
+//             </div>
+//         );
+//     }
+
+//     // ----------------------------------------
+//     // Not found / error — HARD guard before touching pkg
+//     // ----------------------------------------
+//     if (error || !pkg) {
+//         return (
+//             <div className="min-h-screen bg-white">
+//                 <Header />
+//                 <div className="max-w-2xl mx-auto px-4 py-19 text-center">
+//                     <h1 className="text-2xl font-bold text-[#253564] mb-3">
+//                         Package not found
+//                     </h1>
+//                     <p className="text-gray-600 mb-6">
+//                         {error || "This package may have been removed."}
+//                     </p>
+//                     <Link
+//                         to="/packages"
+//                         className="inline-block rounded-lg bg-[#cd9d4e] hover:bg-[#b88d3e] text-white font-semibold px-6 py-3"
+//                     >
+//                         Browse all packages
+//                     </Link>
+//                 </div>
+//             </div>
+//         );
+//     }
+
+//     // =========================================================
+//     // From here on, pkg is guaranteed to be a valid object
+//     // =========================================================
+//     const images = pkg.images;
+
+//     const facts = [
+//         pkg.duration?.days && {
+//             label: "Duration",
+//             value: `${pkg.duration.days} days`,
+//             icon: <Clock className="w-4 h-4 text-blue-500" />,
+//         },
+//         pkg.maxAltitude?.meters && {
+//             label: "Max Altitude",
+//             value: `${pkg.maxAltitude.meters} m`,
+//             icon: <Mountain className="w-4 h-4 text-emerald-500" />,
+//         },
+//         pkg.seasonDisplay && {
+//             label: "Best Season",
+//             value: pkg.seasonDisplay,
+//             icon: <Calendar className="w-4 h-4 text-amber-500" />,
+//         },
+//         pkg.activity && {
+//             label: "Activity",
+//             value: pkg.activity,
+//             icon: <Compass className="w-4 h-4 text-purple-500" />,
+//         },
+//     ].filter(Boolean);
+
+//     return (
+//         <div className="min-h-screen bg-gray-50">
+//             <Header />
+
+//             {/* ============================================
+//                 GALLERY
+//             ============================================ */}
+//             <section className="bg-white">
+//                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-27 pb-4">
+//                     {/* Breadcrumb */}
+//                     <div className="text-xs text-gray-500 mb-4 flex items-center gap-2">
+//                         <Link to="/" className="hover:text-[#cd9d4e]">
+//                             Home
+//                         </Link>
+//                         <span>/</span>
+//                         <Link to="/packages" className="hover:text-[#cd9d4e]">
+//                             Packages
+//                         </Link>
+//                         <span>/</span>
+//                         <span className="text-gray-700 truncate">{pkg.name}</span>
+//                     </div>
+
+//                     {/* Main image + thumbnails */}
+//                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+//                         <div className="lg:col-span-3">
+//                             <div className="aspect-[16/10] rounded-lg overflow-hidden bg-gray-200">
+//                                 {activeImage ? (
+//                                     <img
+//                                         src={activeImage}
+//                                         alt={pkg.name}
+//                                         className="w-full h-full object-cover"
+//                                     />
+//                                 ) : (
+//                                     <div className="w-full h-full flex items-center justify-center text-gray-400">
+//                                         No image
+//                                     </div>
+//                                 )}
+//                             </div>
+//                         </div>
+
+//                         {images.length > 1 && (
+//                             <div className="lg:col-span-1 grid grid-cols-4 lg:grid-cols-1 gap-3">
+//                                 {images.slice(0, 4).map((img, i) => (
+//                                     <button
+//                                         key={img.id || i}
+//                                         onClick={() => setActiveImage(img.url)}
+//                                         className={`aspect-[16/10] rounded-lg overflow-hidden border-2 transition ${activeImage === img.url
+//                                             ? "border-[#cd9d4e]"
+//                                             : "border-transparent hover:border-gray-300"
+//                                             }`}
+//                                     >
+//                                         <img
+//                                             src={img.url}
+//                                             alt=""
+//                                             className="w-full h-full object-cover"
+//                                         />
+//                                     </button>
+//                                 ))}
+//                             </div>
+//                         )}
+//                     </div>
+//                 </div>
+//             </section>
+
+//             {/* ============================================
+//                 MAIN CONTENT
+//             ============================================ */}
+//             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+//                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+//                     {/* LEFT COLUMN */}
+//                     <div className="lg:col-span-2 space-y-8">
+//                         {/* Header */}
+//                         <div>
+//                             <div className="flex items-center gap-2 mb-3">
+//                                 {pkg.category && (
+//                                     <span className="rounded-full bg-[#cd9d4e]/10 text-[#cd9d4e] px-3 py-1 text-xs font-semibold">
+//                                         {pkg.category}
+//                                     </span>
+//                                 )}
+//                                 {pkg.difficulty && (
+//                                     <span className="rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold">
+//                                         {pkg.difficulty}
+//                                     </span>
+//                                 )}
+//                             </div>
+
+//                             <h1 className="text-3xl md:text-4xl font-bold text-[#253564]">
+//                                 {pkg.name}
+//                             </h1>
+
+//                             {(pkg.region || pkg.country) && (
+//                                 <p className="text-gray-500 mt-2 inline-flex items-center gap-1.5">
+//                                     <MapPin className="w-4 h-4 text-red-500" />
+//                                     {[pkg.region, pkg.country]
+//                                         .filter(Boolean)
+//                                         .join(", ")}
+//                                 </p>
+//                             )}
+//                         </div>
+
+//                         {/* Quick facts */}
+//                         {facts.length > 0 && (
+//                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//                                 {facts.map((f, i) => (
+//                                     <Fact
+//                                         key={i}
+//                                         label={f.label}
+//                                         value={f.value}
+//                                         icon={f.icon}
+//                                     />
+//                                 ))}
+//                             </div>
+//                         )}
+
+//                         {/* Overview */}
+//                         {pkg.overview?.trim() && (
+//                             <Section title="Overview">
+//                                 <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+//                                     {pkg.overview}
+//                                 </p>
+//                             </Section>
+//                         )}
+
+//                         {/* Description */}
+//                         {pkg.description?.trim() && (
+//                             <Section title="Description">
+//                                 <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+//                                     {pkg.description}
+//                                 </p>
+//                             </Section>
+//                         )}
+
+//                         {/* Highlights */}
+//                         {pkg.highlights.length > 0 && (
+//                             <Section title="Highlights">
+//                                 <ul className="space-y-2">
+//                                     {pkg.highlights.map((h, i) => (
+//                                         <li
+//                                             key={i}
+//                                             className="flex items-start gap-3 text-gray-700"
+//                                         >
+//                                             <Check className="w-4 h-4 text-[#cd9d4e] mt-0.5 flex-shrink-0" />
+//                                             <span>{h}</span>
+//                                         </li>
+//                                     ))}
+//                                 </ul>
+//                             </Section>
+//                         )}
+
+//                         {/* Itinerary */}
+//                         {pkg.itinerary.length > 0 && (
+//                             <Section title="Itinerary">
+//                                 <div className="space-y-4">
+//                                     {pkg.itinerary.map((day) => {
+//                                         const meta = [
+//                                             day.distance && {
+//                                                 icon: (
+//                                                     <Footprints className="w-3.5 h-3.5 text-indigo-500" />
+//                                                 ),
+//                                                 text: day.distance,
+//                                             },
+//                                             day.altitude?.meters && {
+//                                                 icon: (
+//                                                     <Mountain className="w-3.5 h-3.5 text-emerald-500" />
+//                                                 ),
+//                                                 text: `${day.altitude.meters} m`,
+//                                             },
+//                                             day.accommodation && {
+//                                                 icon: (
+//                                                     <Home className="w-3.5 h-3.5 text-orange-500" />
+//                                                 ),
+//                                                 text: day.accommodation,
+//                                             },
+//                                         ].filter(Boolean);
+
+//                                         const meals = [
+//                                             day.meals?.breakfast && {
+//                                                 icon: (
+//                                                     <Coffee className="w-3.5 h-3.5 text-amber-600" />
+//                                                 ),
+//                                                 text: "Breakfast",
+//                                             },
+//                                             day.meals?.lunch && {
+//                                                 icon: (
+//                                                     <Utensils className="w-3.5 h-3.5 text-rose-500" />
+//                                                 ),
+//                                                 text: "Lunch",
+//                                             },
+//                                             day.meals?.dinner && {
+//                                                 icon: (
+//                                                     <Moon className="w-3.5 h-3.5 text-indigo-600" />
+//                                                 ),
+//                                                 text: "Dinner",
+//                                             },
+//                                         ].filter(Boolean);
+
+//                                         return (
+//                                             <div
+//                                                 key={day.id || day.day}
+//                                                 className="bg-gray-50 rounded-lg p-5 border border-gray-100"
+//                                             >
+//                                                 <div className="flex items-start gap-4">
+//                                                     <div className="flex-shrink-0">
+//                                                         <div className="w-12 h-12 rounded-full bg-[#253564] text-white flex items-center justify-center font-bold text-sm">
+//                                                             Day {day.day}
+//                                                         </div>
+//                                                     </div>
+
+//                                                     <div className="flex-1 min-w-0">
+//                                                         <h4 className="font-semibold text-[#253564]">
+//                                                             {day.title}
+//                                                         </h4>
+
+//                                                         {meta.length > 0 && (
+//                                                             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1.5">
+//                                                                 {meta.map((m, idx) => (
+//                                                                     <span
+//                                                                         key={idx}
+//                                                                         className="inline-flex items-center gap-1.5"
+//                                                                     >
+//                                                                         {m.icon}
+//                                                                         {m.text}
+//                                                                     </span>
+//                                                                 ))}
+//                                                             </div>
+//                                                         )}
+
+//                                                         {day.description && (
+//                                                             <p className="text-gray-700 mt-3 whitespace-pre-line text-sm leading-relaxed">
+//                                                                 {day.description}
+//                                                             </p>
+//                                                         )}
+
+//                                                         {meals.length > 0 && (
+//                                                             <div className="flex flex-wrap gap-3 text-xs text-gray-500 mt-3">
+//                                                                 {meals.map((m, idx) => (
+//                                                                     <span
+//                                                                         key={idx}
+//                                                                         className="inline-flex items-center gap-1.5"
+//                                                                     >
+//                                                                         {m.icon}
+//                                                                         {m.text}
+//                                                                     </span>
+//                                                                 ))}
+//                                                             </div>
+//                                                         )}
+//                                                     </div>
+//                                                 </div>
+//                                             </div>
+//                                         );
+//                                     })}
+//                                 </div>
+//                             </Section>
+//                         )}
+
+//                         {/* Inclusions */}
+//                         {pkg.inclusions.length > 0 && (
+//                             <Section title="What's Included">
+//                                 <div className="space-y-4">
+//                                     {pkg.inclusions.map((group, i) => (
+//                                         <div key={i}>
+//                                             {group.category && (
+//                                                 <h4 className="font-semibold text-[#253564] text-sm mb-2">
+//                                                     {group.category}
+//                                                 </h4>
+//                                             )}
+//                                             <ul className="space-y-1">
+//                                                 {group.items?.map((item, j) => (
+//                                                     <li
+//                                                         key={j}
+//                                                         className="flex items-start gap-2 text-gray-700 text-sm"
+//                                                     >
+//                                                         <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+//                                                         <span>{item}</span>
+//                                                     </li>
+//                                                 ))}
+//                                             </ul>
+//                                         </div>
+//                                     ))}
+//                                 </div>
+//                             </Section>
+//                         )}
+
+//                         {/* Exclusions */}
+//                         {pkg.exclusions.length > 0 && (
+//                             <Section title="What's Not Included">
+//                                 <ul className="space-y-1">
+//                                     {pkg.exclusions.map((ex, i) => (
+//                                         <li
+//                                             key={i}
+//                                             className="flex items-start gap-2 text-gray-700 text-sm"
+//                                         >
+//                                             <X className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+//                                             <span>{ex}</span>
+//                                         </li>
+//                                     ))}
+//                                 </ul>
+//                             </Section>
+//                         )}
+
+//                         {/* FAQs */}
+//                         {pkg.faqs.length > 0 && (
+//                             <Section title="Frequently Asked Questions">
+//                                 <div className="space-y-3">
+//                                     {pkg.faqs.map((faq, i) => (
+//                                         <details
+//                                             key={i}
+//                                             className="bg-gray-50 rounded-lg border border-gray-100"
+//                                         >
+//                                             <summary className="cursor-pointer p-4 font-semibold text-[#253564] text-sm">
+//                                                 {faq.question}
+//                                             </summary>
+//                                             <p className="px-4 pb-4 text-gray-700 text-sm whitespace-pre-line">
+//                                                 {faq.answer}
+//                                             </p>
+//                                         </details>
+//                                     ))}
+//                                 </div>
+//                             </Section>
+//                         )}
+//                     </div>
+
+//                     {/* RIGHT SIDEBAR */}
+//                     <div className="lg:col-span-1">
+//                         <div className="sticky top-24 space-y-4">
+//                             {/* Booking card */}
+//                             <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
+//                                 {pkg.price?.usd && (
+//                                     <>
+//                                         <p className="text-sm text-gray-500">From</p>
+//                                         <div className="flex items-baseline gap-2 mb-4">
+//                                             <span className="text-3xl font-bold text-[#253564]">
+//                                                 ${pkg.price.usd}
+//                                             </span>
+//                                             <span className="text-gray-500 text-sm">
+//                                                 / person
+//                                             </span>
+//                                         </div>
+//                                     </>
+//                                 )}
+
+//                                 <div className="space-y-2 text-sm text-gray-600 mb-5">
+//                                     {pkg.duration?.days && (
+//                                         <div className="flex justify-between items-center">
+//                                             <span className="inline-flex items-center gap-1.5">
+//                                                 <Clock className="w-4 h-4 text-blue-500" />
+//                                                 Duration
+//                                             </span>
+//                                             <span className="font-medium text-gray-900">
+//                                                 {pkg.duration.days} days
+//                                             </span>
+//                                         </div>
+//                                     )}
+//                                     {pkg.difficulty && (
+//                                         <div className="flex justify-between items-center">
+//                                             <span className="inline-flex items-center gap-1.5">
+//                                                 <Compass className="w-4 h-4 text-purple-500" />
+//                                                 Difficulty
+//                                             </span>
+//                                             <span className="font-medium text-gray-900">
+//                                                 {pkg.difficulty}
+//                                             </span>
+//                                         </div>
+//                                     )}
+//                                     {pkg.minGroupSize && pkg.maxGroupSize && (
+//                                         <div className="flex justify-between items-center">
+//                                             <span className="inline-flex items-center gap-1.5">
+//                                                 <Users className="w-4 h-4 text-cyan-500" />
+//                                                 Group Size
+//                                             </span>
+//                                             <span className="font-medium text-gray-900">
+//                                                 {pkg.minGroupSize}–{pkg.maxGroupSize}
+//                                             </span>
+//                                         </div>
+//                                     )}
+//                                 </div>
+
+//                                 <button
+//                                     onClick={() =>
+//                                         navigate(`/packages/${pkg.slug}/request`)
+//                                     }
+//                                     className="w-full rounded-lg bg-[#cd9d4e] hover:bg-[#b88d3e] text-white font-semibold py-3.5 transition"
+//                                 >
+//                                     Request Booking
+//                                 </button>
+
+//                                 <Link
+//                                     to="/contact"
+//                                     className="mt-3 block w-full text-center rounded-lg border border-gray-300 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+//                                 >
+//                                     Ask a Question
+//                                 </Link>
+//                             </div>
+
+//                             {/* Need help */}
+//                             <div className="bg-[#253564] rounded-lg p-6 text-white">
+//                                 <h3 className="font-bold mb-2 inline-flex items-center gap-2">
+//                                     <Info className="w-4 h-4 text-amber-400" />
+//                                     Need help?
+//                                 </h3>
+//                                 <p className="text-sm text-white/80 mb-4">
+//                                     Our travel experts are here to help you plan
+//                                     the perfect trek.
+//                                 </p>
+//                                 <p className="text-sm inline-flex items-center gap-2">
+//                                     <Phone className="w-4 h-4 text-emerald-400" />
+//                                     +977 9843120192
+//                                 </p>
+//                                 <p className="text-sm inline-flex items-center gap-2 mt-1">
+//                                     <Mail className="w-4 h-4 text-sky-400" />
+//                                     info@travelionadventures.com
+//                                 </p>
+//                             </div>
+//                         </div>
+//                     </div>
+//                 </div>
+//             </section>
+//             <Footer />
+//         </div>
+//     );
+// }
+
+// // ----------------------------------------
+// // Subcomponents
+// // ----------------------------------------
+// function Section({ title, children }) {
+//     return (
+//         <div className="bg-white rounded-lg border border-gray-200 p-6">
+//             <h2 className="text-lg font-bold text-[#253564] mb-4">{title}</h2>
+//             {children}
+//         </div>
+//     );
+// }
+
+// function Fact({ label, value, icon }) {
+//     return (
+//         <div className="bg-white rounded-lg border border-gray-200 p-4">
+//             <p className="text-xs text-gray-500 mb-1.5 inline-flex items-center gap-1.5">
+//                 {icon}
+//                 {label}
+//             </p>
+//             <p className="font-semibold text-[#253564] text-sm">{value}</p>
+//         </div>
+//     );
+// }
+
 import { useEffect, useState } from "react";
+
+import {
+    Calendar,
+    Check,
+    ChevronDown,
+    Clock,
+    Compass,
+    Hotel,
+    Mail,
+    MapPin,
+    Mountain,
+    Phone,
+    Users,
+    X
+} from "lucide-react";
+
 import { Link, useNavigate, useParams } from "react-router-dom";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { publicFetch } from "../utils/api";
+
+// ============================================
+// Normalizer
+// ============================================
+function normalizePackage(pkg) {
+    if (!pkg || typeof pkg !== "object") return null;
+
+    const toBool = (v) =>
+        v === true || v === 1 || v === "true";
+
+    return {
+        ...pkg,
+
+        price: {
+            usd: pkg.priceUsd ?? null,
+            npr: pkg.priceNpr ?? null,
+        },
+
+        duration: {
+            days: pkg.durationDays ?? null,
+            nights: pkg.durationNights ?? null,
+        },
+
+        maxAltitude: {
+            meters: pkg.maxAltitudeMeters ?? null,
+            feet: pkg.maxAltitudeFeet ?? null,
+        },
+
+        images: Array.isArray(pkg.images)
+            ? pkg.images
+            : [],
+
+        itinerary: Array.isArray(pkg.itinerary)
+            ? pkg.itinerary.map((it) => ({
+                ...it,
+
+                altitude: {
+                    meters: it.altitudeMeters ?? null,
+                    feet: it.altitudeFeet ?? null,
+                },
+
+                meals: {
+                    breakfast: toBool(
+                        it.mealsBreakfast
+                    ),
+                    lunch: toBool(it.mealsLunch),
+                    dinner: toBool(it.mealsDinner),
+                },
+            }))
+            : [],
+
+        highlights: Array.isArray(pkg.highlights)
+            ? pkg.highlights
+            : [],
+
+        exclusions: Array.isArray(pkg.exclusions)
+            ? pkg.exclusions
+            : [],
+
+        inclusions: Array.isArray(pkg.inclusions)
+            ? pkg.inclusions
+            : [],
+
+        faqs: Array.isArray(pkg.faqs)
+            ? pkg.faqs
+            : [],
+    };
+}
 
 export default function PackageDetail() {
     const { slug } = useParams();
@@ -10,63 +732,114 @@ export default function PackageDetail() {
     const [pkg, setPkg] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
-    // Gallery
     const [activeImage, setActiveImage] = useState(null);
 
-    // ----------------------------------------
-    // Fetch package by slug
-    // ----------------------------------------
+    // ============================================
+    // Fetch package
+    // ============================================
     useEffect(() => {
+        let cancelled = false;
+
         (async () => {
             try {
                 setLoading(true);
-                const { data } = await publicFetch(`/packages/${slug}`);
+                setError("");
 
-                if (!data.success) throw new Error(data.message);
+                const { data } = await publicFetch(
+                    `/packages/${slug}`
+                );
 
-                setPkg(data.data);
+                if (!data?.success) {
+                    throw new Error(
+                        data?.message || "Package not found"
+                    );
+                }
+
+                if (!data.data) {
+                    throw new Error(
+                        "Package data is empty"
+                    );
+                }
+
+                const normalized = normalizePackage(
+                    data.data
+                );
+
+                if (!normalized) {
+                    throw new Error(
+                        "Could not parse package data"
+                    );
+                }
+
+                if (cancelled) return;
+
+                setPkg(normalized);
 
                 const featured =
-                    data.data.images?.find((img) => img.isFeatured) ||
-                    data.data.images?.[0];
-                setActiveImage(featured?.url || null);
+                    normalized.images.find(
+                        (img) => img.isFeatured
+                    ) || normalized.images[0];
+
+                setActiveImage(
+                    featured?.url || null
+                );
             } catch (err) {
-                setError(err.message);
+                if (!cancelled) {
+                    setError(err.message);
+                }
             } finally {
-                setLoading(false);
+                if (!cancelled) {
+                    setLoading(false);
+                }
             }
         })();
+
+        return () => {
+            cancelled = true;
+        };
     }, [slug]);
 
-    // ----------------------------------------
-    // Loading / error states
-    // ----------------------------------------
+    // ============================================
+    // Loading
+    // ============================================
     if (loading) {
         return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-[#f7f5ef]">
                 <Header />
-                <div className="max-w-7xl mx-auto px-4 py-16">
-                    <p className="text-gray-500">Loading package...</p>
+
+                <div className="max-w-7xl mx-auto px-6 py-32">
+                    <div className="h-5 w-40 bg-[#e9e5d9] rounded animate-pulse" />
+                    <div className="mt-5 h-8 w-72 bg-[#e9e5d9] rounded animate-pulse" />
                 </div>
             </div>
         );
     }
 
+    // ============================================
+    // Error
+    // ============================================
     if (error || !pkg) {
         return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-[#f7f5ef]">
                 <Header />
-                <div className="max-w-2xl mx-auto px-4 py-19 text-center">
-                    <h1 className="text-2xl font-bold text-[#253564] mb-3">
+
+                <div className="max-w-2xl mx-auto px-6 py-32 text-center">
+                    <p className="text-[#c99b52] uppercase tracking-[0.2em] text-xs font-semibold mb-4">
+                        Sorry
+                    </p>
+
+                    <h1 className="font-serif text-3xl md:text-4xl text-[#101d30] mb-4">
                         Package not found
                     </h1>
-                    <p className="text-gray-600 mb-6">
-                        {error || "This package may have been removed."}
+
+                    <p className="text-[#18243a]/55 mb-8">
+                        {error ||
+                            "This package may have been removed."}
                     </p>
+
                     <Link
                         to="/packages"
-                        className="inline-block rounded-lg bg-[#cd9d4e] hover:bg-[#b88d3e] text-white font-semibold px-6 py-3"
+                        className="inline-flex rounded-xl bg-[#c99b52] hover:bg-[#b88d45] text-white font-semibold px-6 py-3 transition-colors"
                     >
                         Browse all packages
                     </Link>
@@ -75,38 +848,84 @@ export default function PackageDetail() {
         );
     }
 
-    const images = pkg.images || [];
-    const featuredImage = images.find((img) => img.isFeatured) || images[0];
+    // ============================================
+    // Package data
+    // ============================================
+    const images = pkg.images;
 
-    // ----------------------------------------
-    // Render
-    // ----------------------------------------
+    const facts = [
+        pkg.duration?.days && {
+            label: "Duration",
+            value: `${pkg.duration.days} days`,
+            icon: (
+                <Clock className="w-4 h-4 text-[#c99b52]" />
+            ),
+        },
+
+        pkg.maxAltitude?.meters && {
+            label: "Max Altitude",
+            value: `${pkg.maxAltitude.meters} m`,
+            icon: (
+                <Mountain className="w-4 h-4 text-[#c99b52]" />
+            ),
+        },
+
+        pkg.seasonDisplay && {
+            label: "Best Season",
+            value: pkg.seasonDisplay,
+            icon: (
+                <Calendar className="w-4 h-4 text-[#c99b52]" />
+            ),
+        },
+
+        pkg.activity && {
+            label: "Activity",
+            value: pkg.activity,
+            icon: (
+                <Compass className="w-4 h-4 text-[#c99b52]" />
+            ),
+        },
+    ].filter(Boolean);
+
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-[#f7f5ef] text-[#18243a]">
             <Header />
 
             {/* ============================================
                 GALLERY
             ============================================ */}
-            <section className="bg-white">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-27 pb-4">
+            <section className="bg-[#f7f5ef]">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-6">
+
                     {/* Breadcrumb */}
-                    <div className="text-xs text-gray-500 mb-4">
-                        <Link to="/" className="hover:text-[#cd9d4e]">
+                    <div className="text-xs text-[#18243a]/45 mb-5 flex items-center gap-2">
+                        <Link
+                            to="/"
+                            className="hover:text-[#c99b52] transition-colors"
+                        >
                             Home
                         </Link>
-                        <span className="mx-2">/</span>
-                        <Link to="/packages" className="hover:text-[#cd9d4e]">
+
+                        <span>/</span>
+
+                        <Link
+                            to="/packages"
+                            className="hover:text-[#c99b52] transition-colors"
+                        >
                             Packages
                         </Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-gray-700">{pkg.name}</span>
+
+                        <span>/</span>
+
+                        <span className="text-[#18243a]/65 truncate">
+                            {pkg.name}
+                        </span>
                     </div>
 
-                    {/* Main image + thumbnails */}
+                    {/* Gallery */}
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                         <div className="lg:col-span-3">
-                            <div className="aspect-[16/10] rounded-lg overflow-hidden bg-gray-200">
+                            <div className="aspect-[16/9] rounded-[1.75rem] overflow-hidden bg-[#e9e5d9]">
                                 {activeImage ? (
                                     <img
                                         src={activeImage}
@@ -114,7 +933,7 @@ export default function PackageDetail() {
                                         className="w-full h-full object-cover"
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    <div className="w-full h-full flex items-center justify-center text-[#18243a]/30">
                                         No image
                                     </div>
                                 )}
@@ -123,22 +942,31 @@ export default function PackageDetail() {
 
                         {images.length > 1 && (
                             <div className="lg:col-span-1 grid grid-cols-4 lg:grid-cols-1 gap-3">
-                                {images.slice(0, 4).map((img, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => setActiveImage(img.url)}
-                                        className={`aspect-[16/10] rounded-lg overflow-hidden border-2 transition ${activeImage === img.url
-                                                ? "border-[#cd9d4e]"
-                                                : "border-transparent hover:border-gray-300"
-                                            }`}
-                                    >
-                                        <img
-                                            src={img.url}
-                                            alt=""
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </button>
-                                ))}
+                                {images
+                                    .slice(0, 4)
+                                    .map((img, i) => (
+                                        <button
+                                            key={
+                                                img.id || i
+                                            }
+                                            onClick={() =>
+                                                setActiveImage(
+                                                    img.url
+                                                )
+                                            }
+                                            className={`aspect-[16/9] rounded-2xl overflow-hidden border-2 transition-all ${activeImage ===
+                                                img.url
+                                                ? "border-[#c99b52]"
+                                                : "border-transparent hover:border-[#18243a]/20"
+                                                }`}
+                                        >
+                                            <img
+                                                src={img.url}
+                                                alt=""
+                                                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                            />
+                                        </button>
+                                    ))}
                             </div>
                         )}
                     </div>
@@ -148,313 +976,454 @@ export default function PackageDetail() {
             {/* ============================================
                 MAIN CONTENT
             ============================================ */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* LEFT COLUMN */}
+            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+
+                    {/* =====================================
+                        LEFT COLUMN
+                    ===================================== */}
                     <div className="lg:col-span-2 space-y-8">
+
                         {/* Header */}
                         <div>
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="rounded-full bg-[#cd9d4e]/10 text-[#cd9d4e] px-3 py-1 text-xs font-semibold">
-                                    {pkg.category}
-                                </span>
-                                <span className="rounded-full bg-gray-100 text-gray-700 px-3 py-1 text-xs font-semibold">
-                                    {pkg.difficulty}
-                                </span>
+                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                                {pkg.category && (
+                                    <span className="rounded-full bg-[#c99b52]/10 text-[#b18442] px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] font-semibold">
+                                        {pkg.category}
+                                    </span>
+                                )}
+
+                                {pkg.difficulty && (
+                                    <span className="rounded-full bg-[#101d30]/7 text-[#18243a]/65 px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] font-semibold">
+                                        {pkg.difficulty}
+                                    </span>
+                                )}
                             </div>
 
-                            <h1 className="text-3xl md:text-4xl font-bold text-[#253564]">
+                            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-[#101d30]">
                                 {pkg.name}
                             </h1>
 
-                            <p className="text-gray-500 mt-2">
-                                📍 {pkg.region}, {pkg.country}
-                            </p>
+                            {pkg.region && (
+                                <p className="text-[#18243a]/50 mt-4 inline-flex items-center gap-2 text-sm">
+                                    <MapPin className="w-4 h-4 text-[#c99b52]" />
+                                    {pkg.region}, Nepal
+                                </p>
+                            )}
                         </div>
 
-                        {/* Quick facts */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <Fact label="Duration" value={`${pkg.duration?.days} days`} />
-                            <Fact
-                                label="Max Altitude"
-                                value={
-                                    pkg.maxAltitude?.meters
-                                        ? `${pkg.maxAltitude.meters} m`
-                                        : "—"
-                                }
-                            />
-                            <Fact
-                                label="Best Season"
-                                value={pkg.seasonDisplay || "—"}
-                            />
-                            <Fact
-                                label="Activity"
-                                value={pkg.activity || "—"}
-                            />
-                        </div>
+                        {/* Quick Facts */}
+                        {facts.length > 0 && (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {facts.map((f, i) => (
+                                    <Fact
+                                        key={i}
+                                        label={f.label}
+                                        value={f.value}
+                                        icon={f.icon}
+                                    />
+                                ))}
+                            </div>
+                        )}
 
                         {/* Overview */}
-                        {pkg.overview && (
+                        {pkg.overview?.trim() && (
                             <Section title="Overview">
-                                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                                <p className="text-[#18243a]/70 leading-relaxed whitespace-pre-line">
                                     {pkg.overview}
                                 </p>
                             </Section>
                         )}
 
                         {/* Description */}
-                        {pkg.description && (
-                            <Section title="Description">
-                                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                        {pkg.description?.trim() && (
+                            <Section title="The Journey">
+                                <p className="text-[#18243a]/70 leading-relaxed whitespace-pre-line">
                                     {pkg.description}
                                 </p>
                             </Section>
                         )}
 
                         {/* Highlights */}
-                        {pkg.highlights?.length > 0 && (
+                        {pkg.highlights.length > 0 && (
                             <Section title="Highlights">
-                                <ul className="space-y-2">
-                                    {pkg.highlights.map((h, i) => (
-                                        <li
-                                            key={i}
-                                            className="flex items-start gap-3 text-gray-700"
-                                        >
-                                            <span className="text-[#cd9d4e] mt-1">
-                                                ✓
-                                            </span>
-                                            <span>{h}</span>
-                                        </li>
-                                    ))}
+                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                                    {pkg.highlights.map(
+                                        (h, i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-start gap-3 text-[#18243a]/70"
+                                            >
+                                                <span className="mt-0.5 w-5 h-5 rounded-full bg-[#c99b52]/10 flex items-center justify-center flex-shrink-0">
+                                                    <Check className="w-3 h-3 text-[#c99b52]" />
+                                                </span>
+
+                                                <span>
+                                                    {h}
+                                                </span>
+                                            </li>
+                                        )
+                                    )}
                                 </ul>
                             </Section>
                         )}
 
                         {/* Itinerary */}
                         {pkg.itinerary?.length > 0 && (
-                            <Section title="Itinerary">
-                                <div className="space-y-4">
-                                    {pkg.itinerary.map((day) => (
-                                        <div
-                                            key={day._id || day.day}
-                                            className="bg-gray-50 rounded-lg p-5 border border-gray-100"
+                            <section className="mt-16">
+                                <Section
+                                    eyebrow="The journey"
+                                    title="Your itinerary"
+                                    description="A day-by-day look at your adventure."
+                                />
+
+                                <div className="mt-8 space-y-3">
+                                    {pkg.itinerary.map((day, index) => (
+                                        <details
+                                            key={day._id || index}
+                                            className="group overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white"
                                         >
-                                            <div className="flex items-start gap-4">
-                                                <div className="flex-shrink-0">
-                                                    <div className="w-12 h-12 rounded-full bg-[#253564] text-white flex items-center justify-center font-bold text-sm">
-                                                        Day {day.day}
+                                            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 md:p-6">
+                                                <div className="flex items-center gap-4">
+                                                    {/* Day number */}
+                                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#101d30] font-serif text-sm text-white">
+                                                        {day.day}
+                                                    </div>
+
+                                                    <div>
+                                                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c99b52]">
+                                                            Day {day.day}
+                                                        </p>
+
+                                                        <h3 className="mt-1 font-serif text-lg text-[#18243a] md:text-xl">
+                                                            {day.title}
+                                                        </h3>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex-1">
-                                                    <h4 className="font-semibold text-[#253564]">
-                                                        {day.title}
-                                                    </h4>
+                                                {/* Arrow */}
+                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f7f5ef] transition-transform duration-300 group-open:rotate-180">
+                                                    <ChevronDown size={18} className="text-[#18243a]" />
+                                                </div>
+                                            </summary>
 
-                                                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1">
-                                                        {day.distance && (
-                                                            <span>🥾 {day.distance}</span>
-                                                        )}
-                                                        {day.altitude?.meters && (
-                                                            <span>
-                                                                ⛰ {day.altitude.meters} m
-                                                            </span>
-                                                        )}
-                                                        {day.accommodation && (
-                                                            <span>
-                                                                🏠 {day.accommodation}
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-                                                    <p className="text-gray-700 mt-3 whitespace-pre-line text-sm leading-relaxed">
+                                            {/* Expandable content */}
+                                            <div className="border-t border-[#e9e5dc] px-5 pb-6 pt-5 md:px-6">
+                                                {day.description && (
+                                                    <p className="max-w-3xl text-sm leading-7 text-[#687080]">
                                                         {day.description}
                                                     </p>
+                                                )}
 
-                                                    {day.meals && (
-                                                        <div className="flex gap-3 text-xs text-gray-500 mt-3">
-                                                            {day.meals.breakfast && (
-                                                                <span>☕ Breakfast</span>
-                                                            )}
-                                                            {day.meals.lunch && (
-                                                                <span>🍱 Lunch</span>
-                                                            )}
-                                                            {day.meals.dinner && (
-                                                                <span>🍽 Dinner</span>
-                                                            )}
+                                                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                                                    {day.location && (
+                                                        <div className="rounded-xl bg-[#f7f5ef] p-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <MapPin size={16} className="text-[#c99b52]" />
+                                                                <span className="text-xs font-semibold uppercase tracking-wider text-[#8a8d94]">
+                                                                    Location
+                                                                </span>
+                                                            </div>
+
+                                                            <p className="mt-2 text-sm font-medium text-[#18243a]">
+                                                                {day.location}
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {day.accommodation && (
+                                                        <div className="rounded-xl bg-[#f7f5ef] p-4">
+                                                            <div className="flex items-center gap-2">
+                                                                <Hotel size={16} className="text-[#c99b52]" />
+                                                                <span className="text-xs font-semibold uppercase tracking-wider text-[#8a8d94]">
+                                                                    Accommodation
+                                                                </span>
+                                                            </div>
+
+                                                            <p className="mt-2 text-sm font-medium text-[#18243a]">
+                                                                {day.accommodation}
+                                                            </p>
                                                         </div>
                                                     )}
                                                 </div>
                                             </div>
-                                        </div>
+                                        </details>
                                     ))}
                                 </div>
-                            </Section>
+                            </section>
                         )}
 
                         {/* Inclusions */}
-                        {pkg.inclusions?.length > 0 && (
+                        {pkg.inclusions.length > 0 && (
                             <Section title="What's Included">
-                                <div className="space-y-4">
-                                    {pkg.inclusions.map((group, i) => (
-                                        <div key={i}>
-                                            <h4 className="font-semibold text-[#253564] text-sm mb-2">
-                                                {group.category}
-                                            </h4>
-                                            <ul className="space-y-1">
-                                                {group.items?.map((item, j) => (
-                                                    <li
-                                                        key={j}
-                                                        className="flex items-start gap-2 text-gray-700 text-sm"
-                                                    >
-                                                        <span className="text-green-600 mt-0.5">
-                                                            ✓
-                                                        </span>
-                                                        <span>{item}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    ))}
+                                <div className="space-y-5">
+                                    {pkg.inclusions.map(
+                                        (group, i) => (
+                                            <div key={i}>
+                                                {group.category && (
+                                                    <h4 className="font-semibold text-[#101d30] text-sm mb-3">
+                                                        {
+                                                            group.category
+                                                        }
+                                                    </h4>
+                                                )}
+
+                                                <ul className="space-y-2">
+                                                    {group.items?.map(
+                                                        (
+                                                            item,
+                                                            j
+                                                        ) => (
+                                                            <li
+                                                                key={
+                                                                    j
+                                                                }
+                                                                className="flex items-start gap-2 text-[#18243a]/70 text-sm"
+                                                            >
+                                                                <Check className="w-4 h-4 text-[#c99b52] mt-0.5 flex-shrink-0" />
+                                                                <span>
+                                                                    {
+                                                                        item
+                                                                    }
+                                                                </span>
+                                                            </li>
+                                                        )
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
                             </Section>
                         )}
 
                         {/* Exclusions */}
-                        {pkg.exclusions?.length > 0 && (
+                        {pkg.exclusions.length > 0 && (
                             <Section title="What's Not Included">
-                                <ul className="space-y-1">
-                                    {pkg.exclusions.map((ex, i) => (
-                                        <li
-                                            key={i}
-                                            className="flex items-start gap-2 text-gray-700 text-sm"
-                                        >
-                                            <span className="text-red-500 mt-0.5">✕</span>
-                                            <span>{ex}</span>
-                                        </li>
-                                    ))}
+                                <ul className="space-y-2">
+                                    {pkg.exclusions.map(
+                                        (ex, i) => (
+                                            <li
+                                                key={i}
+                                                className="flex items-start gap-2 text-[#18243a]/70 text-sm"
+                                            >
+                                                <X className="w-4 h-4 text-[#9b665c] mt-0.5 flex-shrink-0" />
+                                                <span>
+                                                    {ex}
+                                                </span>
+                                            </li>
+                                        )
+                                    )}
                                 </ul>
                             </Section>
                         )}
 
                         {/* FAQs */}
-                        {pkg.faqs?.length > 0 && (
+                        {pkg.faqs.length > 0 && (
                             <Section title="Frequently Asked Questions">
                                 <div className="space-y-3">
-                                    {pkg.faqs.map((faq, i) => (
-                                        <details
-                                            key={i}
-                                            className="bg-gray-50 rounded-lg border border-gray-100"
-                                        >
-                                            <summary className="cursor-pointer p-4 font-semibold text-[#253564] text-sm">
-                                                {faq.question}
-                                            </summary>
-                                            <p className="px-4 pb-4 text-gray-700 text-sm whitespace-pre-line">
-                                                {faq.answer}
-                                            </p>
-                                        </details>
-                                    ))}
+                                    {pkg.faqs.map(
+                                        (faq, i) => (
+                                            <details
+                                                key={i}
+                                                className="bg-[#faf9f5] rounded-xl border border-[#18243a]/8 overflow-hidden"
+                                            >
+                                                <summary className="cursor-pointer p-4 font-semibold text-[#101d30] text-sm hover:text-[#c99b52] transition-colors">
+                                                    {
+                                                        faq.question
+                                                    }
+                                                </summary>
+
+                                                <p className="px-4 pb-5 text-[#18243a]/65 text-sm leading-relaxed whitespace-pre-line">
+                                                    {
+                                                        faq.answer
+                                                    }
+                                                </p>
+                                            </details>
+                                        )
+                                    )}
                                 </div>
                             </Section>
                         )}
                     </div>
 
-                    {/* RIGHT SIDEBAR */}
+                    {/* =====================================
+                        RIGHT SIDEBAR
+                    ===================================== */}
                     <div className="lg:col-span-1">
-                        <div className="sticky top-24 space-y-4">
-                            {/* Booking card */}
-                            <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-                                <p className="text-sm text-gray-500">From</p>
-                                <div className="flex items-baseline gap-2 mb-4">
-                                    <span className="text-3xl font-bold text-[#253564]">
-                                        ${pkg.price?.usd}
-                                    </span>
-                                    <span className="text-gray-500 text-sm">
-                                        / person
-                                    </span>
-                                </div>
+                        <div className="sticky top-28 space-y-4">
 
-                                <div className="space-y-2 text-sm text-gray-600 mb-5">
-                                    <div className="flex justify-between">
-                                        <span>Duration</span>
-                                        <span className="font-medium text-gray-900">
-                                            {pkg.duration?.days} days
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Difficulty</span>
-                                        <span className="font-medium text-gray-900">
-                                            {pkg.difficulty}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span>Group Size</span>
-                                        <span className="font-medium text-gray-900">
-                                            {pkg.minGroupSize}–{pkg.maxGroupSize}
-                                        </span>
-                                    </div>
+                            {/* Booking Card */}
+                            <div className="bg-white rounded-[1.75rem] border border-[#18243a]/10 p-6 lg:p-7 shadow-sm">
+                                {pkg.price?.usd && (
+                                    <>
+                                        <p className="text-[11px] uppercase tracking-[0.15em] text-[#18243a]/40 mb-1">
+                                            From
+                                        </p>
+
+                                        <div className="flex items-baseline gap-2 mb-6">
+                                            <span className="font-serif text-4xl text-[#101d30]">
+                                                $
+                                                {
+                                                    pkg
+                                                        .price
+                                                        .usd
+                                                }
+                                            </span>
+
+                                            <span className="text-[#18243a]/45 text-sm">
+                                                / person
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
+
+                                <div className="space-y-3 text-sm text-[#18243a]/60 mb-6">
+                                    {pkg.duration?.days && (
+                                        <SidebarFact
+                                            icon={
+                                                <Clock />
+                                            }
+                                            label="Duration"
+                                            value={`${pkg.duration.days} days`}
+                                        />
+                                    )}
+
+                                    {pkg.difficulty && (
+                                        <SidebarFact
+                                            icon={
+                                                <Compass />
+                                            }
+                                            label="Difficulty"
+                                            value={
+                                                pkg.difficulty
+                                            }
+                                        />
+                                    )}
+
+                                    {pkg.minGroupSize &&
+                                        pkg.maxGroupSize && (
+                                            <SidebarFact
+                                                icon={
+                                                    <Users />
+                                                }
+                                                label="Group Size"
+                                                value={`${pkg.minGroupSize}–${pkg.maxGroupSize}`}
+                                            />
+                                        )}
                                 </div>
 
                                 <button
                                     onClick={() =>
-                                        navigate(`/packages/${pkg.slug}/book`)
+                                        navigate(
+                                            `/packages/${pkg.slug}/booking-request`
+                                        )
                                     }
-                                    className="w-full rounded-lg bg-[#cd9d4e] hover:bg-[#b88d3e] text-white font-semibold py-3.5 transition"
+                                    className="w-full rounded-xl bg-[#c99b52] hover:bg-[#b88d45] text-white font-semibold py-3.5 transition-all duration-300 hover:shadow-md"
                                 >
-                                    Book This Trek
+                                    Request Booking
                                 </button>
 
                                 <Link
                                     to="/contact"
-                                    className="mt-3 block w-full text-center rounded-lg border border-gray-300 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                    className="mt-3 block w-full text-center rounded-xl border border-[#18243a]/15 py-3 text-sm font-semibold text-[#18243a]/70 hover:bg-[#f7f5ef] hover:border-[#18243a]/25 transition-colors"
                                 >
                                     Ask a Question
                                 </Link>
                             </div>
 
-                            {/* Need help */}
-                            <div className="bg-[#253564] rounded-lg p-6 text-white">
-                                <h3 className="font-bold mb-2">Need help?</h3>
-                                <p className="text-sm text-white/80 mb-4">
-                                    Our travel experts are here to help you plan the
-                                    perfect trek.
+                            {/* Help Card */}
+                            <div className="bg-[#101d30] rounded-[1.75rem] p-6 lg:p-7 text-white">
+                                <p className="text-[#d6aa63] uppercase tracking-[0.18em] text-[10px] font-semibold mb-3">
+                                    Need help?
                                 </p>
-                                <p className="text-sm">
-                                    📞 +977 1234567890
+
+                                <h3 className="font-serif text-2xl mb-3">
+                                    Planning your
+                                    <br />
+                                    <span className="italic">
+                                        journey?
+                                    </span>
+                                </h3>
+
+                                <p className="text-sm text-white/55 leading-relaxed mb-5">
+                                    Our travel experts are here to
+                                    help you plan the right trek
+                                    for you.
                                 </p>
-                                <p className="text-sm">
-                                    ✉ info@trektravel.com
-                                </p>
+
+                                <div className="space-y-2 text-sm text-white/75">
+                                    <p className="inline-flex items-center gap-2">
+                                        <Phone className="w-4 h-4 text-[#d6aa63]" />
+                                        +977 9843120192
+                                    </p>
+
+                                    <p className="inline-flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-[#d6aa63]" />
+                                        info@travelionadventures.com
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <Footer />
         </div>
     );
 }
 
-// ----------------------------------------
-// Subcomponents
-// ----------------------------------------
+// ============================================
+// SECTION
+// ============================================
 function Section({ title, children }) {
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-lg font-bold text-[#253564] mb-4">
+        <div className="bg-white rounded-[1.5rem] border border-[#18243a]/8 p-6 sm:p-7">
+            <h2 className="font-serif text-2xl text-[#101d30] mb-5">
                 {title}
             </h2>
+
             {children}
         </div>
     );
 }
 
-function Fact({ label, value }) {
+// ============================================
+// FACT
+// ============================================
+function Fact({ label, value, icon }) {
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <p className="text-xs text-gray-500 mb-1">{label}</p>
-            <p className="font-semibold text-[#253564] text-sm">
-                {value || "—"}
+        <div className="bg-white rounded-2xl border border-[#18243a]/8 p-4">
+            <p className="text-[10px] uppercase tracking-[0.1em] text-[#18243a]/40 mb-2 inline-flex items-center gap-1.5">
+                {icon}
+                {label}
             </p>
+
+            <p className="font-semibold text-[#101d30] text-sm">
+                {value}
+            </p>
+        </div>
+    );
+}
+
+// ============================================
+// SIDEBAR FACT
+// ============================================
+function SidebarFact({ icon, label, value }) {
+    return (
+        <div className="flex justify-between items-center gap-4">
+            <span className="inline-flex items-center gap-2">
+                <span className="text-[#c99b52] [&>svg]:w-4 [&>svg]:h-4">
+                    {icon}
+                </span>
+
+                {label}
+            </span>
+
+            <span className="font-medium text-[#101d30]">
+                {value}
+            </span>
         </div>
     );
 }
