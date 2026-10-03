@@ -55,7 +55,7 @@ const Home = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#f7f5ef] text-[#18243a] overflow-hidden">
+        <div className="min-h-screen bg-[#f7f5ef]  text-[#18243a] overflow-hidden">
             <Header />
             <Seo
                 title="Himalayan Treks, Tours & Adventures in Nepal"
@@ -180,7 +180,7 @@ const Home = () => {
             )}
 
 
-            <section className="bg-white py-20 sm:py-18">
+            <section className="bg-[#f7f5ef] py-20 sm:py-18">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <SectionHeading
                         eyebrow="Explore Nepal"

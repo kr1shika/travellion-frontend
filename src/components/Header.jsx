@@ -69,19 +69,19 @@ const Header = () => {
     //         handleDestinationClick(destinations[0].destination);
     //     }
     // }, [openMenu, destinations]);
- const handleDestinationClick = async (dest) => {
-    setActiveDestination(dest);
-    setLoadingPackages(true);
-    try {
-        const packages = await fetchPackages({ destination: dest, limit: 8 });
-        setDestinationPackages(Array.isArray(packages) ? packages : []);
-    } catch (err) {
-        console.error("Packages fetch failed:", err);
-        setDestinationPackages([]);
-    } finally {
-        setLoadingPackages(false);
-    }
-};
+    const handleDestinationClick = async (dest) => {
+        setActiveDestination(dest);
+        setLoadingPackages(true);
+        try {
+            const packages = await fetchPackages({ destination: dest, limit: 8 });
+            setDestinationPackages(Array.isArray(packages) ? packages : []);
+        } catch (err) {
+            console.error("Packages fetch failed:", err);
+            setDestinationPackages([]);
+        } finally {
+            setLoadingPackages(false);
+        }
+    };
 
     const navLinkClass = `text-xs sm:text-sm font-medium transition-all duration-200 px-3 py-1.5 rounded-lg ${showSolidHeader
         ? 'text-gray-700 hover:text-[#cd9d4e] hover:bg-gray-100'
@@ -89,7 +89,7 @@ const Header = () => {
         }`;
 
     return (
-        <header className={`fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+        <header className={` bg-[#f7f5ef] fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
             }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex justify-between items-center">
                 <Link to="/" className="flex items-center flex-shrink-0">
