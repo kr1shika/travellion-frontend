@@ -337,7 +337,7 @@ export default function PackageDetail() {
             {/* ============================================
                 MAIN CONTENT
             ============================================ */}
-            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-12">
+            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-10">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                     {/* =====================================
@@ -514,10 +514,24 @@ export default function PackageDetail() {
                             </section>
                         )}
                         {/* Simple included list */}
-
+                        {pkg.included?.length > 0 && (
+                            <Section title="What's Included">
+                                <ul className="space-y-1">
+                                    {pkg.included.map((item, i) => (
+                                        <li
+                                            key={i}
+                                            className="flex items-start gap-2 text-gray-700 text-sm"
+                                        >
+                                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                                            <span>{item}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Section>
+                        )}
 
                         {/* Inclusions */}
-                        {pkg.included?.length > 0 && (
+                        {/* {pkg.included?.length > 0 && (
                             <Section title="What's Included">
                                 <div className="space-y-5">
                                     {pkg.included.map(
@@ -558,7 +572,7 @@ export default function PackageDetail() {
                                     )}
                                 </div>
                             </Section>
-                        )}
+                        )} */}
 
                         {/* Exclusions */}
                         {pkg.exclusions.length > 0 && (
