@@ -89,7 +89,7 @@ const Header = () => {
         }`;
 
     return (
-        <header className={` bg-[#f7f5ef] fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
+        <header className={` bg-[#f7f5ef] fixed top-0 py-2 px-4 left-0 w-full z-50 transition-all duration-300 ${showSolidHeader ? 'bg-[#f7f5ef] backdrop-blur-md shadow-sm' : 'bg-transparent'
             }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex justify-between items-center">
                 <Link to="/" className="flex items-center flex-shrink-0">
