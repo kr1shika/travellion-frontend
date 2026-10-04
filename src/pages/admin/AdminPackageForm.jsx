@@ -37,6 +37,7 @@ export default function AdminPackageForm() {
 
     const [highlights, setHighlights] = useState([""]);
     const [exclusions, setExclusions] = useState([""]);
+    const [included, setIncluded] = useState([""]);
     const [images, setImages] = useState([]);
     const [itinerary, setItinerary] = useState([]);
 
@@ -77,6 +78,7 @@ export default function AdminPackageForm() {
                 });
                 setHighlights(p.highlights?.length ? p.highlights : [""]);
                 setExclusions(p.exclusions?.length ? p.exclusions : [""]);
+                setIncluded(p.included?.length ? p.included : [""]);
                 setImages(p.images || []);
                 setItinerary(p.itinerary || []);
             }
@@ -222,6 +224,7 @@ export default function AdminPackageForm() {
 
                 highlights: highlights.filter((h) => h.trim()),
                 exclusions: exclusions.filter((e) => e.trim()),
+                included: included.filter((i) => i.trim()),
 
                 images,
                 itinerary: itinerary.map((it, i) => ({
@@ -339,7 +342,39 @@ export default function AdminPackageForm() {
                     <button type="button" onClick={() => setHighlights([...highlights, ""])}
                         className="text-sm text-slate-700 underline">+ Add highlight</button>
                 </Section>
-
+                {/* INCLUDED */}
+                <Section title="What's Included">
+                    {included.map((item, i) => (
+                        <div key={i} className="flex gap-2">
+                            <input
+                                className="flex-1 rounded-lg border border-slate-300 px-3 py-2"
+                                value={item}
+                                placeholder="e.g. All meals during trek"
+                                onChange={(e) => {
+                                    const copy = [...included];
+                                    copy[i] = e.target.value;
+                                    setIncluded(copy);
+                                }}
+                            />
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setIncluded(included.filter((_, x) => x !== i))
+                                }
+                                className="text-red-600 text-sm"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    ))}
+                    <button
+                        type="button"
+                        onClick={() => setIncluded([...included, ""])}
+                        className="text-sm text-slate-700 underline"
+                    >
+                        + Add item
+                    </button>
+                </Section>
                 {/* EXCLUSIONS */}
                 <Section title="Exclusions">
                     {exclusions.map((ex, i) => (
