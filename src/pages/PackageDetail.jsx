@@ -248,7 +248,7 @@ export default function PackageDetail() {
                 GALLERY
             ============================================ */}
             <section className="bg-[#f7f5ef]">
-                <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-6">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8 pt-28 pb-3">
 
                     {/* Breadcrumb */}
                     <div className="text-xs text-[#18243a]/45 mb-5 flex items-center gap-2">
@@ -329,7 +329,7 @@ export default function PackageDetail() {
             {/* ============================================
                 MAIN CONTENT
             ============================================ */}
-            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-10">
+            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-5">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                     {/* =====================================
