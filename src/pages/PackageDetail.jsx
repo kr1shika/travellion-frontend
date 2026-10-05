@@ -421,48 +421,51 @@ export default function PackageDetail() {
                             </Section>
                         )}
 
-                        {/* Itinerary */}
                         {/* ============================================
     ITINERARY
 ============================================ */}
                         {pkg.itinerary.length > 0 && (
-                            <div className="bg-white rounded-lg border border-gray-200 p-6">
-                                <h2 className="text-lg font-bold text-[#253564] mb-6">
-                                    Itinerary
-                                </h2>
+                            <Section title="Itinerary">
+                                {/* Timeline container */}
+                                <div className="relative pl-1">
+                                    {/* Vertical connecting line — centered under the 9px (36px) markers */}
+                                    <div
+                                        className="absolute top-2 bottom-2 w-px bg-[#18243a]/10"
+                                        style={{ left: "17px" }}
+                                    />
 
-                                <div className="relative">
-                                    {/* Vertical connecting line */}
-                                    <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gray-200" />
-
-                                    <div className="space-y-1">
+                                    <div className="space-y-0">
                                         {pkg.itinerary.map((day, idx) => {
+                                            const isFirst = idx === 0;
+                                            const isLast = idx === pkg.itinerary.length - 1;
+                                            const isPeak = !isFirst && !isLast;
+
                                             const meta = [
                                                 day.distance && {
-                                                    icon: <Footprints className="w-3.5 h-3.5 text-indigo-500" />,
+                                                    icon: <Footprints className="w-3.5 h-3.5" />,
                                                     text: day.distance,
                                                 },
                                                 day.altitude?.meters && {
-                                                    icon: <Mountain className="w-3.5 h-3.5 text-emerald-500" />,
+                                                    icon: <Mountain className="w-3.5 h-3.5" />,
                                                     text: `${day.altitude.meters} m`,
                                                 },
                                                 day.accommodation && {
-                                                    icon: <Home className="w-3.5 h-3.5 text-orange-500" />,
+                                                    icon: <Home className="w-3.5 h-3.5" />,
                                                     text: day.accommodation,
                                                 },
                                             ].filter(Boolean);
 
                                             const meals = [
                                                 day.meals?.breakfast && {
-                                                    icon: <Coffee className="w-3.5 h-3.5 text-amber-600" />,
+                                                    icon: <Coffee className="w-3.5 h-3.5" />,
                                                     text: "Breakfast",
                                                 },
                                                 day.meals?.lunch && {
-                                                    icon: <Utensils className="w-3.5 h-3.5 text-rose-500" />,
+                                                    icon: <Utensils className="w-3.5 h-3.5" />,
                                                     text: "Lunch",
                                                 },
                                                 day.meals?.dinner && {
-                                                    icon: <Moon className="w-3.5 h-3.5 text-indigo-600" />,
+                                                    icon: <Moon className="w-3.5 h-3.5" />,
                                                     text: "Dinner",
                                                 },
                                             ].filter(Boolean);
@@ -473,38 +476,48 @@ export default function PackageDetail() {
                                                     open={idx === 0}
                                                     className="group relative"
                                                 >
-                                                    {/* Row header — the summary is clickable */}
-                                                    <summary className="flex items-start gap-4 cursor-pointer list-none py-3 rounded-lg hover:bg-gray-50 px-1 transition">
-                                                        {/* Circle / map pin marker */}
-                                                        <div className="relative z-10 flex-shrink-0">
-                                                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-sm">
-                                                                <MapPin className="w-5 h-5 text-white" />
-                                                            </div>
+                                                    {/* Row header — clickable */}
+                                                    <summary className="flex items-start gap-4 cursor-pointer list-none py-4 rounded-xl hover:bg-[#faf9f5] px-2 transition-colors">
+                                                        {/* Marker */}
+                                                        <div className="relative z-10 flex-shrink-0 w-[34px] flex justify-center pt-0.5">
+                                                            {isFirst ? (
+                                                                // START — gold filled with map pin
+                                                                <div className="w-8 h-8 rounded-full bg-[#c99b52] flex items-center justify-center shadow-sm ring-4 ring-[#f7f5ef]">
+                                                                    <MapPin className="w-4 h-4 text-white" strokeWidth={2.5} />
+                                                                </div>
+                                                            ) : isLast ? (
+                                                                // END — navy filled with flag
+                                                                <div className="w-8 h-8 rounded-full bg-[#101d30] flex items-center justify-center shadow-sm ring-4 ring-[#f7f5ef]">
+                                                                    <Flag className="w-4 h-4 text-[#d6aa63]" strokeWidth={2.5} />
+                                                                </div>
+                                                            ) : (
+                                                                // MIDDLE — small hollow dot on the line
+                                                                <div className="w-8 h-8 flex items-center justify-center">
+                                                                    <div className="w-2.5 h-2.5 rounded-full bg-white border-2 border-[#c99b52]/60 ring-4 ring-[#f7f5ef]" />
+                                                                </div>
+                                                            )}
                                                         </div>
 
-                                                        {/* Title + always-visible summary */}
-                                                        <div className="flex-1 min-w-0 pt-1.5">
-                                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                                <span className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600">
+                                                        {/* Title + meta */}
+                                                        <div className="flex-1 min-w-0 pt-1">
+                                                            <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                                                                <span className="text-[10px] uppercase tracking-[0.15em] font-semibold text-[#b18442]">
                                                                     Day {day.day}
                                                                 </span>
                                                                 {day.title && (
-                                                                    <>
-                                                                        <span className="text-gray-300">·</span>
-                                                                        <span className="font-semibold text-[#253564]">
-                                                                            {day.title}
-                                                                        </span>
-                                                                    </>
+                                                                    <span className="font-serif text-lg text-[#101d30]">
+                                                                        {day.title}
+                                                                    </span>
                                                                 )}
                                                             </div>
 
-                                                            {/* Meta row (distance, altitude, accommodation) */}
+                                                            {/* Meta row */}
                                                             {meta.length > 0 && (
-                                                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1">
+                                                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#18243a]/50 mt-1.5">
                                                                     {meta.map((m, i) => (
                                                                         <span
                                                                             key={i}
-                                                                            className="inline-flex items-center gap-1.5"
+                                                                            className="inline-flex items-center gap-1.5 [&>svg]:text-[#c99b52]/70"
                                                                         >
                                                                             {m.icon}
                                                                             {m.text}
@@ -515,28 +528,28 @@ export default function PackageDetail() {
                                                         </div>
 
                                                         {/* Chevron */}
-                                                        <div className="flex-shrink-0 pt-2.5">
-                                                            <ChevronDown className="w-4 h-4 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
+                                                        <div className="flex-shrink-0 pt-2">
+                                                            <ChevronDown className="w-4 h-4 text-[#18243a]/40 transition-transform duration-200 group-open:rotate-180" />
                                                         </div>
                                                     </summary>
 
-                                                    {/* Expanded body */}
-                                                    <div className="pl-14 pr-1 pb-5">
+                                                    {/* Expanded content */}
+                                                    <div className="pl-12 pr-2 pb-5">
                                                         {day.description && (
-                                                            <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+                                                            <p className="text-[#18243a]/70 whitespace-pre-line text-sm leading-relaxed">
                                                                 {day.description}
                                                             </p>
                                                         )}
 
                                                         {meals.length > 0 && (
-                                                            <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
-                                                                <span className="uppercase tracking-wide text-[10px] font-semibold text-gray-400">
+                                                            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-[#18243a]/55 mt-4 pt-4 border-t border-[#18243a]/8">
+                                                                <span className="uppercase tracking-[0.12em] text-[10px] font-semibold text-[#b18442]">
                                                                     Meals
                                                                 </span>
                                                                 {meals.map((m, i) => (
                                                                     <span
                                                                         key={i}
-                                                                        className="inline-flex items-center gap-1.5"
+                                                                        className="inline-flex items-center gap-1.5 [&>svg]:text-[#c99b52]/70"
                                                                     >
                                                                         {m.icon}
                                                                         {m.text}
@@ -550,7 +563,7 @@ export default function PackageDetail() {
                                         })}
                                     </div>
                                 </div>
-                            </div>
+                            </Section>
                         )}
                         {/* Simple included list */}
                         {pkg.included?.length > 0 && (
