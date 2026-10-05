@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import heroBg from "../assets/bg.jpg";
+import heroBg2 from "../assets/nagarkot.jpg";
+import heroBg3 from "../assets/langtang.jpg";
+
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Seo from "../components/Seo";
@@ -274,7 +277,7 @@ const Home = () => {
                                             (img) => img.isFeatured
                                         )?.url ||
                                         featured[0]?.images?.[0]?.url ||
-                                        heroBg
+                                        heroBg2
                                     }
                                     alt="Himalayan adventure"
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-1000"
@@ -339,7 +342,7 @@ const Home = () => {
             ====================================================== */}
             <section className="relative min-h-[65vh] flex items-center overflow-hidden">
                 <img
-                    src={heroBg}
+                    src={heroBg3}
                     alt="Himalayan landscape"
                     className="absolute inset-0 w-full h-full object-cover"
                 />

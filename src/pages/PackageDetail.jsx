@@ -403,7 +403,7 @@ export default function PackageDetail() {
 
                         {/* Description */}
                         {pkg.description?.trim() && (
-                            <Section title="The Journey">
+                            <Section title="About the package">
                                 <p className="text-[#18243a]/70 leading-relaxed whitespace-pre-line">
                                     {pkg.description}
                                 </p>
