@@ -27,9 +27,24 @@ export default function AdminItineraryForm() {
                 setPackageData(p);
 
                 // Sort days ascending
-                const sorted = [...(p.itinerary || [])].sort(
-                    (a, b) => a.day - b.day
-                );
+                const sorted = [...(p.itinerary || [])]
+                    .sort((a, b) => a.day - b.day)
+                    .map((it) => ({
+                        ...it,
+                        altitude: {
+                            meters: it.altitudeMeters ?? "",
+                            feet: it.altitudeFeet ?? "",
+                        },
+                        meals: {
+                            breakfast:
+                                it.mealsBreakfast === true || it.mealsBreakfast === 1,
+                            lunch:
+                                it.mealsLunch === true || it.mealsLunch === 1,
+                            dinner:
+                                it.mealsDinner === true || it.mealsDinner === 1,
+                        },
+                    }));
+
                 setItinerary(sorted);
             } catch (err) {
                 setError(err.message);
@@ -151,10 +166,10 @@ export default function AdminItineraryForm() {
                             : undefined,
                     },
                     accommodation: d.accommodation || "",
-                    meals: d.meals || {
-                        breakfast: false,
-                        lunch: false,
-                        dinner: false,
+                    meals: {
+                        breakfast: d.meals?.breakfast === true,
+                        lunch: d.meals?.lunch === true,
+                        dinner: d.meals?.dinner === true,
                     },
                 })),
             };
