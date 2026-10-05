@@ -52,7 +52,7 @@ export default function AdminItineraryForm() {
                 distance: "",
                 altitude: { meters: "", feet: "" },
                 accommodation: "",
-                meals: { breakfast: true, lunch: true, dinner: true },
+                meals: { breakfast: false, lunch: false, dinner: false },
             },
         ]);
     };
@@ -253,7 +253,7 @@ export default function AdminItineraryForm() {
                                 width: `${Math.min(
                                     100,
                                     (itinerary.length / packageData.duration.days) *
-                                        100
+                                    100
                                 )}%`,
                             }}
                         />
