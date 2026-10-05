@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 
 import {
-    Calendar, Check, ChevronDown,
+    Calendar,
+    Check,
+    ChevronDown,
     ChevronUp,
-    Clock, Coffee, Compass,
-    Footprints, Home,
-    Mail, MapPin, Moon, Mountain,
-    Phone, Users, Utensils, X
+    Clock,
+    Coffee,
+    Compass,
+    Footprints,
+    Home,
+    Mail,
+    MapPin,
+    Moon,
+    Mountain,
+    Phone,
+    Users,
+    Utensils,
+    X,
 } from "lucide-react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
