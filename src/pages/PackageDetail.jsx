@@ -734,7 +734,10 @@ function SidebarFact({ icon, label, value }) {
 
 
 // ============================================
-// ITINERARY CARD — with header toggle
+// ITINERARY CARD
+// Adapts to two content styles:
+//   - Multi-day trek: "Day 1: Arrival in Kathmandu"
+//   - Schedule / heli tour: "5:30 – 5:50 am: Hotel pickup"
 // ============================================
 function ItineraryCard({ itinerary }) {
     const PREVIEW_COUNT = 5;
@@ -747,12 +750,22 @@ function ItineraryCard({ itinerary }) {
     const hasMore = itinerary.length > PREVIEW_COUNT;
     const hiddenCount = itinerary.length - PREVIEW_COUNT;
 
+    // Detect if the itinerary is schedule-style (every entry starts with a time)
+    const isScheduleStyle = itinerary.every((d) =>
+        /^\d{1,2}[:.]\d{2}/.test((d.title || "").trim())
+    );
+
     return (
         <div className="bg-white rounded-[1.5rem] border border-[#18243a]/8 p-6 sm:p-7">
-            {/* Header row with toggle */}
+            {/* Header row */}
             <div className="flex items-center justify-between mb-5 gap-4">
-                <h2 className="font-serif text-2xl text-[#101d30]">
+                <h2 className="font-serif text-2xl text-[#101d30] flex items-baseline gap-3">
                     Itinerary
+                    {isScheduleStyle && (
+                        <span className="text-[10px] uppercase tracking-[0.18em] font-semibold text-[#b18442]">
+                            · Schedule
+                        </span>
+                    )}
                 </h2>
 
                 {hasMore && (
@@ -768,7 +781,8 @@ function ItineraryCard({ itinerary }) {
                             </>
                         ) : (
                             <>
-                                View all {itinerary.length} days
+                                View all {itinerary.length}{" "}
+                                {isScheduleStyle ? "stops" : "days"}
                                 <ChevronDown className="w-4 h-4" />
                             </>
                         )}
@@ -776,34 +790,62 @@ function ItineraryCard({ itinerary }) {
                 )}
             </div>
 
-            {/* Days */}
+            {/* Days / Stops */}
             <div className="divide-y divide-[#18243a]/8">
-                {visible.map((day, idx) => {
+                {visible.map((entry, idx) => {
+                    const title = (entry.title || "").trim();
+
+                    // Extract "05:30 – 05:50 am" from the start of title if present
+                    const timeMatch = title.match(
+                        /^(\d{1,2}[:.]\d{2}(?:\s*(?:am|pm))?)\s*[-–—]\s*(\d{1,2}[:.]\d{2}(?:\s*(?:am|pm))?)(.*)$/i
+                    );
+
+                    // A single time like "05:30 am: Something"
+                    const singleTimeMatch = title.match(
+                        /^(\d{1,2}[:.]\d{2}\s*(?:am|pm)?)\s*[:·-]\s*(.*)$/i
+                    );
+
+                    const timeRange = timeMatch
+                        ? `${timeMatch[1].trim()} – ${timeMatch[2].trim()}`
+                        : singleTimeMatch
+                            ? singleTimeMatch[1].trim()
+                            : null;
+
+                    const titleRest = timeMatch
+                        ? timeMatch[3].replace(/^[\s:·-]+/, "").trim()
+                        : singleTimeMatch
+                            ? singleTimeMatch[2].trim()
+                            : title;
+
                     const meta = [
-                        day.distance && {
-                            icon: <Footprints className="w-3.5 h-3.5" />,
-                            text: day.distance,
+                        entry.distance && {
+                            icon: /min|hour|hr/i.test(entry.distance) ? (
+                                <Clock className="w-3.5 h-3.5" />
+                            ) : (
+                                <Footprints className="w-3.5 h-3.5" />
+                            ),
+                            text: entry.distance,
                         },
-                        day.altitude?.meters && {
+                        entry.altitude?.meters && {
                             icon: <Mountain className="w-3.5 h-3.5" />,
-                            text: `${day.altitude.meters} m`,
+                            text: `${entry.altitude.meters} m`,
                         },
-                        day.accommodation && {
+                        entry.accommodation && {
                             icon: <Home className="w-3.5 h-3.5" />,
-                            text: day.accommodation,
+                            text: entry.accommodation,
                         },
                     ].filter(Boolean);
 
                     const meals = [
-                        day.meals?.breakfast && {
+                        entry.meals?.breakfast && {
                             icon: <Coffee className="w-3.5 h-3.5" />,
                             text: "Breakfast",
                         },
-                        day.meals?.lunch && {
+                        entry.meals?.lunch && {
                             icon: <Utensils className="w-3.5 h-3.5" />,
                             text: "Lunch",
                         },
-                        day.meals?.dinner && {
+                        entry.meals?.dinner && {
                             icon: <Moon className="w-3.5 h-3.5" />,
                             text: "Dinner",
                         },
@@ -811,20 +853,33 @@ function ItineraryCard({ itinerary }) {
 
                     return (
                         <details
-                            key={day.id || day.day}
+                            key={entry.id || entry.day}
                             open={idx === 0}
                             className="group"
                         >
                             <summary className="flex items-center gap-4 cursor-pointer list-none py-4 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
+                                {/* Left badge — clock for schedule, number for trek */}
                                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
-                                    <span className="font-serif text-lg text-[#b18442] leading-none">
-                                        {String(day.day).padStart(2, "0")}
-                                    </span>
+                                    {timeRange ? (
+                                        <Clock className="w-5 h-5 text-[#b18442]" />
+                                    ) : (
+                                        <span className="font-serif text-lg text-[#b18442] leading-none">
+                                            {String(entry.day).padStart(2, "0")}
+                                        </span>
+                                    )}
                                 </div>
 
+                                {/* Title + meta */}
                                 <div className="flex-1 min-w-0">
+                                    {/* Time pill (only for schedule entries) */}
+                                    {timeRange && (
+                                        <span className="inline-block text-[10px] uppercase tracking-[0.15em] font-semibold text-[#b18442] bg-[#c99b52]/8 px-2 py-0.5 rounded mb-1">
+                                            {timeRange}
+                                        </span>
+                                    )}
+
                                     <p className="font-serif text-lg text-[#101d30] leading-snug">
-                                        {day.title || `Day ${day.day}`}
+                                        {titleRest || title}
                                     </p>
 
                                     {meta.length > 0 && (
@@ -846,9 +901,9 @@ function ItineraryCard({ itinerary }) {
                             </summary>
 
                             <div className="pl-16 pr-2 pb-5 pt-1">
-                                {day.description && (
+                                {entry.description && (
                                     <p className="text-[#18243a]/70 whitespace-pre-line text-sm leading-relaxed">
-                                        {day.description}
+                                        {entry.description}
                                     </p>
                                 )}
 
@@ -874,10 +929,12 @@ function ItineraryCard({ itinerary }) {
                 })}
             </div>
 
-            {/* Subtle hint at the bottom when collapsed */}
+            {/* Bottom hint when collapsed */}
             {hasMore && !showAll && (
                 <p className="text-xs text-[#18243a]/40 mt-4 text-center">
-                    {hiddenCount} more day{hiddenCount !== 1 && "s"} hidden
+                    {hiddenCount} more{" "}
+                    {isScheduleStyle ? "stop" : "day"}
+                    {hiddenCount !== 1 && "s"} hidden
                 </p>
             )}
         </div>
