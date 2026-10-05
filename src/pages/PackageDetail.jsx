@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import {
     Calendar, Check, ChevronDown, Clock, Coffee, Compass,
+    Flag,
     Footprints, Home,
     Mail, MapPin, Moon, Mountain,
     Phone, Users, Utensils, X
