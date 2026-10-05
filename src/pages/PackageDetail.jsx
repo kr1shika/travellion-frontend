@@ -422,14 +422,12 @@ export default function PackageDetail() {
                                 </ul>
                             </Section>
                         )}
+
                         {/* ============================================
     ITINERARY
 ============================================ */}
                         {pkg.itinerary.length > 0 && (
-                            <Section title="Itinerary">
-                                {/* Full timeline — collapsed when "showAll" is false */}
-                                <ItineraryList itinerary={pkg.itinerary} />
-                            </Section>
+                            <ItineraryCard itinerary={pkg.itinerary} />
                         )}
                         {/* Simple included list */}
                         {pkg.included?.length > 0 && (
@@ -722,10 +720,12 @@ function SidebarFact({ icon, label, value }) {
         </div>
     );
 }
+
+
 // ============================================
-// ITINERARY LIST — with expand/collapse
+// ITINERARY CARD — with header toggle
 // ============================================
-function ItineraryList({ itinerary }) {
+function ItineraryCard({ itinerary }) {
     const PREVIEW_COUNT = 5;
     const [showAll, setShowAll] = useState(false);
 
@@ -733,10 +733,39 @@ function ItineraryList({ itinerary }) {
         ? itinerary
         : itinerary.slice(0, PREVIEW_COUNT);
 
+    const hasMore = itinerary.length > PREVIEW_COUNT;
     const hiddenCount = itinerary.length - PREVIEW_COUNT;
 
     return (
-        <>
+        <div className="bg-white rounded-[1.5rem] border border-[#18243a]/8 p-6 sm:p-7">
+            {/* Header row with toggle */}
+            <div className="flex items-center justify-between mb-5 gap-4">
+                <h2 className="font-serif text-2xl text-[#101d30]">
+                    Itinerary
+                </h2>
+
+                {hasMore && (
+                    <button
+                        type="button"
+                        onClick={() => setShowAll((s) => !s)}
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#b18442] hover:text-[#c99b52] transition-colors flex-shrink-0"
+                    >
+                        {showAll ? (
+                            <>
+                                Show less
+                                <ChevronUp className="w-4 h-4" />
+                            </>
+                        ) : (
+                            <>
+                                View all {itinerary.length} days
+                                <ChevronDown className="w-4 h-4" />
+                            </>
+                        )}
+                    </button>
+                )}
+            </div>
+
+            {/* Days */}
             <div className="divide-y divide-[#18243a]/8">
                 {visible.map((day, idx) => {
                     const meta = [
@@ -772,18 +801,16 @@ function ItineraryList({ itinerary }) {
                     return (
                         <details
                             key={day.id || day.day}
-                            open={idx === 0 && !showAll ? false : idx === 0}
+                            open={idx === 0}
                             className="group"
                         >
                             <summary className="flex items-center gap-4 cursor-pointer list-none py-4 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
-                                {/* Day number badge */}
                                 <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
                                     <span className="font-serif text-lg text-[#b18442] leading-none">
                                         {String(day.day).padStart(2, "0")}
                                     </span>
                                 </div>
 
-                                {/* Title + meta */}
                                 <div className="flex-1 min-w-0">
                                     <p className="font-serif text-lg text-[#101d30] leading-snug">
                                         {day.title || `Day ${day.day}`}
@@ -804,11 +831,9 @@ function ItineraryList({ itinerary }) {
                                     )}
                                 </div>
 
-                                {/* Chevron */}
                                 <ChevronDown className="w-5 h-5 text-[#18243a]/40 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
                             </summary>
 
-                            {/* Expanded content */}
                             <div className="pl-16 pr-2 pb-5 pt-1">
                                 {day.description && (
                                     <p className="text-[#18243a]/70 whitespace-pre-line text-sm leading-relaxed">
@@ -838,34 +863,12 @@ function ItineraryList({ itinerary }) {
                 })}
             </div>
 
-            {/* Expand / collapse toggle */}
-            {itinerary.length > PREVIEW_COUNT && (
-                <div className="mt-6 pt-6 border-t border-[#18243a]/8 text-center">
-                    <button
-                        type="button"
-                        onClick={() => setShowAll((s) => !s)}
-                        className="inline-flex items-center gap-2 rounded-xl border border-[#18243a]/15 px-6 py-3 text-sm font-semibold text-[#18243a]/70 hover:bg-[#faf9f5] hover:border-[#c99b52]/40 hover:text-[#b18442] transition-colors"
-                    >
-                        {showAll ? (
-                            <>
-                                Show less
-                                <ChevronUp className="w-4 h-4" />
-                            </>
-                        ) : (
-                            <>
-                                View all {itinerary.length} days
-                                <ChevronDown className="w-4 h-4" />
-                            </>
-                        )}
-                    </button>
-
-                    {!showAll && hiddenCount > 0 && (
-                        <p className="text-xs text-[#18243a]/45 mt-3">
-                            {hiddenCount} more day{hiddenCount !== 1 && "s"} hidden
-                        </p>
-                    )}
-                </div>
+            {/* Subtle hint at the bottom when collapsed */}
+            {hasMore && !showAll && (
+                <p className="text-xs text-[#18243a]/40 mt-4 text-center">
+                    {hiddenCount} more day{hiddenCount !== 1 && "s"} hidden
+                </p>
             )}
-        </>
+        </div>
     );
 }
