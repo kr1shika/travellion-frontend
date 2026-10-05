@@ -152,9 +152,9 @@ export default function AdminItineraryForm() {
                     },
                     accommodation: d.accommodation || "",
                     meals: d.meals || {
-                        breakfast: true,
-                        lunch: true,
-                        dinner: true,
+                        breakfast: false,
+                        lunch: false,
+                        dinner: false,
                     },
                 })),
             };
