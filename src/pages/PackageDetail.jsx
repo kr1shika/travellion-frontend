@@ -857,48 +857,53 @@ function ItineraryCard({ itinerary }) {
                             open={idx === 0}
                             className="group"
                         >
-                            <summary className="flex items-center gap-4 cursor-pointer list-none py-4 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
-                                {/* Left badge — clock for schedule, number for trek */}
-                                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
-                                    {timeRange ? (
-                                        <Clock className="w-5 h-5 text-[#b18442]" />
-                                    ) : (
-                                        <span className="font-serif text-lg text-[#b18442] leading-none">
-                                            {String(entry.day).padStart(2, "0")}
-                                        </span>
-                                    )}
-                                </div>
+                          <summary className="flex items-center gap-3 cursor-pointer list-none py-3.5 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
+    {/* Small clock badge */}
+    <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
+        {timeRange ? (
+            <Clock className="w-4 h-4 text-[#b18442]" />
+        ) : (
+            <span className="font-serif text-sm text-[#b18442] leading-none">
+                {String(entry.day).padStart(2, "0")}
+            </span>
+        )}
+    </div>
 
-                                {/* Title + meta */}
-                                <div className="flex-1 min-w-0">
-                                    {/* Time pill (only for schedule entries) */}
-                                    {timeRange && (
-                                        <span className="inline-block text-[10px] uppercase tracking-[0.15em] font-semibold text-[#b18442] bg-[#c99b52]/8 px-2 py-0.5 rounded mb-1">
-                                            {timeRange}
-                                        </span>
-                                    )}
+    <div className="flex-1 min-w-0">
+        {/* If there's a real title after stripping time, show title + time pill.
+            Otherwise just show the time once as the title. */}
+        {titleRest ? (
+            <>
+                {timeRange && (
+                    <span className="inline-block text-[10px] uppercase tracking-[0.15em] font-semibold text-[#b18442] bg-[#c99b52]/8 px-2 py-0.5 rounded mb-1">
+                        {timeRange}
+                    </span>
+                )}
+                <p className="text-[15px] font-medium text-[#101d30] leading-snug">
+                    {titleRest}
+                </p>
+            </>
+        ) : (
+            /* No title besides the time — show the time once, styled as the title */
+            <p className="font-serif text-base text-[#101d30] leading-snug">
+                {timeRange || rawTitle}
+            </p>
+        )}
 
-                                    <p className="font-serif text-lg text-[#101d30] leading-snug">
-                                        {titleRest || title}
-                                    </p>
+        {meta.length > 0 && (
+            <div className="flex flex-wrap gap-x-3.5 gap-y-1 text-[11px] text-[#18243a]/50 mt-1 [&>span>svg]:text-[#c99b52]/70">
+                {meta.map((m, i) => (
+                    <span key={i} className="inline-flex items-center gap-1.5">
+                        {m.icon}
+                        {m.text}
+                    </span>
+                ))}
+            </div>
+        )}
+    </div>
 
-                                    {meta.length > 0 && (
-                                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#18243a]/50 mt-1.5 [&>span>svg]:text-[#c99b52]/70">
-                                            {meta.map((m, i) => (
-                                                <span
-                                                    key={i}
-                                                    className="inline-flex items-center gap-1.5"
-                                                >
-                                                    {m.icon}
-                                                    {m.text}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <ChevronDown className="w-5 h-5 text-[#18243a]/40 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
-                            </summary>
+    <ChevronDown className="w-4 h-4 text-[#18243a]/40 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
+</summary>
 
                             <div className="pl-16 pr-2 pb-5 pt-1">
                                 {entry.description && (
