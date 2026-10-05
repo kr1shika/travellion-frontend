@@ -171,7 +171,7 @@ export default function AdminPackageForm() {
                 altitude: { meters: "", feet: "" },
                 accommodation: "",
                 distance: "",
-                meals: { breakfast: true, lunch: true, dinner: true },
+                meals: { breakfast: false, lunch: false, dinner: false },
             },
         ]);
     };
