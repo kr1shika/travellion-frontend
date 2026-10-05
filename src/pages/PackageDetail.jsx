@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import {
     Calendar, Check, ChevronDown, Clock, Coffee, Compass,
-    Flag,
     Footprints, Home,
     Mail, MapPin, Moon, Mountain,
     Phone, Users, Utensils, X
@@ -480,7 +479,7 @@ export default function PackageDetail() {
                                                     {/* Row header — clickable */}
                                                     <summary className="flex items-start gap-4 cursor-pointer list-none py-4 rounded-xl hover:bg-[#faf9f5] px-2 transition-colors">
                                                         {/* Marker */}
-                                                        <div className="relative z-10 flex-shrink-0 w-[34px] flex justify-center pt-0.5">
+                                                        {/* <div className="relative z-10 flex-shrink-0 w-[34px] flex justify-center pt-0.5">
                                                             {isFirst ? (
                                                                 // START — gold filled with map pin
                                                                 <div className="w-8 h-8 rounded-full bg-[#c99b52] flex items-center justify-center shadow-sm ring-4 ring-[#f7f5ef]">
@@ -497,7 +496,7 @@ export default function PackageDetail() {
                                                                     <div className="w-2.5 h-2.5 rounded-full bg-white border-2 border-[#c99b52]/60 ring-4 ring-[#f7f5ef]" />
                                                                 </div>
                                                             )}
-                                                        </div>
+                                                        </div> */}
 
                                                         {/* Title + meta */}
                                                         <div className="flex-1 min-w-0 pt-1">
