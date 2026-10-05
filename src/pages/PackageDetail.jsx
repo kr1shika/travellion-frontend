@@ -329,7 +329,7 @@ export default function PackageDetail() {
             {/* ============================================
                 MAIN CONTENT
             ============================================ */}
-            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-5">
+            <section className="max-w-7xl mx-auto px-6 lg:px-8 py-6 lg:py-3">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                     {/* =====================================
@@ -339,7 +339,7 @@ export default function PackageDetail() {
 
                         {/* Header */}
                         <div>
-                            <div className="flex flex-wrap items-center gap-2 mb-4">
+                            <div className="flex flex-wrap items-center gap-2 mb-3">
                                 {pkg.category && (
                                     <span className="rounded-full bg-[#c99b52]/10 text-[#b18442] px-3 py-1.5 text-[11px] uppercase tracking-[0.1em] font-semibold">
                                         {pkg.category}
