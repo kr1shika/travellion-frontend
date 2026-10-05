@@ -1,18 +1,10 @@
 import { useEffect, useState } from "react";
 
 import {
-    Calendar,
-    Check,
-    ChevronDown,
-    Clock,
-    Compass,
-    Hotel,
-    Mail,
-    MapPin,
-    Mountain,
-    Phone,
-    Users,
-    X
+    Calendar, Check, ChevronDown, Clock, Coffee, Compass,
+    Footprints, Home,
+    Mail, MapPin, Moon, Mountain,
+    Phone, Users, Utensils, X
 } from "lucide-react";
 
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -430,88 +422,135 @@ export default function PackageDetail() {
                         )}
 
                         {/* Itinerary */}
-                        {pkg.itinerary?.length > 0 && (
-                            <section className="mt-16">
-                                <Section
-                                    eyebrow="The journey"
-                                    title="Your itinerary"
-                                    description="A day-by-day look at your adventure."
-                                />
+                        {/* ============================================
+    ITINERARY
+============================================ */}
+                        {pkg.itinerary.length > 0 && (
+                            <div className="bg-white rounded-lg border border-gray-200 p-6">
+                                <h2 className="text-lg font-bold text-[#253564] mb-6">
+                                    Itinerary
+                                </h2>
 
-                                <div className="mt-8 space-y-3">
-                                    {pkg.itinerary.map((day, index) => (
-                                        <details
-                                            key={day._id || index}
-                                            className="group overflow-hidden rounded-2xl border border-[#e4dfd4] bg-white"
-                                        >
-                                            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 md:p-6">
-                                                <div className="flex items-center gap-4">
-                                                    {/* Day number */}
-                                                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#101d30] font-serif text-sm text-white">
-                                                        {day.day}
-                                                    </div>
+                                <div className="relative">
+                                    {/* Vertical connecting line */}
+                                    <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gray-200" />
 
-                                                    <div>
-                                                        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c99b52]">
-                                                            Day {day.day}
-                                                        </p>
+                                    <div className="space-y-1">
+                                        {pkg.itinerary.map((day, idx) => {
+                                            const meta = [
+                                                day.distance && {
+                                                    icon: <Footprints className="w-3.5 h-3.5 text-indigo-500" />,
+                                                    text: day.distance,
+                                                },
+                                                day.altitude?.meters && {
+                                                    icon: <Mountain className="w-3.5 h-3.5 text-emerald-500" />,
+                                                    text: `${day.altitude.meters} m`,
+                                                },
+                                                day.accommodation && {
+                                                    icon: <Home className="w-3.5 h-3.5 text-orange-500" />,
+                                                    text: day.accommodation,
+                                                },
+                                            ].filter(Boolean);
 
-                                                        <h3 className="mt-1 font-serif text-lg text-[#18243a] md:text-xl">
-                                                            {day.title}
-                                                        </h3>
-                                                    </div>
-                                                </div>
+                                            const meals = [
+                                                day.meals?.breakfast && {
+                                                    icon: <Coffee className="w-3.5 h-3.5 text-amber-600" />,
+                                                    text: "Breakfast",
+                                                },
+                                                day.meals?.lunch && {
+                                                    icon: <Utensils className="w-3.5 h-3.5 text-rose-500" />,
+                                                    text: "Lunch",
+                                                },
+                                                day.meals?.dinner && {
+                                                    icon: <Moon className="w-3.5 h-3.5 text-indigo-600" />,
+                                                    text: "Dinner",
+                                                },
+                                            ].filter(Boolean);
 
-                                                {/* Arrow */}
-                                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f7f5ef] transition-transform duration-300 group-open:rotate-180">
-                                                    <ChevronDown size={18} className="text-[#18243a]" />
-                                                </div>
-                                            </summary>
+                                            return (
+                                                <details
+                                                    key={day.id || day.day}
+                                                    open={idx === 0}
+                                                    className="group relative"
+                                                >
+                                                    {/* Row header — the summary is clickable */}
+                                                    <summary className="flex items-start gap-4 cursor-pointer list-none py-3 rounded-lg hover:bg-gray-50 px-1 transition">
+                                                        {/* Circle / map pin marker */}
+                                                        <div className="relative z-10 flex-shrink-0">
+                                                            <div className="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center shadow-sm">
+                                                                <MapPin className="w-5 h-5 text-white" />
+                                                            </div>
+                                                        </div>
 
-                                            {/* Expandable content */}
-                                            <div className="border-t border-[#e9e5dc] px-5 pb-6 pt-5 md:px-6">
-                                                {day.description && (
-                                                    <p className="max-w-3xl text-sm leading-7 text-[#687080]">
-                                                        {day.description}
-                                                    </p>
-                                                )}
-
-                                                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                                                    {day.location && (
-                                                        <div className="rounded-xl bg-[#f7f5ef] p-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <MapPin size={16} className="text-[#c99b52]" />
-                                                                <span className="text-xs font-semibold uppercase tracking-wider text-[#8a8d94]">
-                                                                    Location
+                                                        {/* Title + always-visible summary */}
+                                                        <div className="flex-1 min-w-0 pt-1.5">
+                                                            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                                <span className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600">
+                                                                    Day {day.day}
                                                                 </span>
+                                                                {day.title && (
+                                                                    <>
+                                                                        <span className="text-gray-300">·</span>
+                                                                        <span className="font-semibold text-[#253564]">
+                                                                            {day.title}
+                                                                        </span>
+                                                                    </>
+                                                                )}
                                                             </div>
 
-                                                            <p className="mt-2 text-sm font-medium text-[#18243a]">
-                                                                {day.location}
-                                                            </p>
+                                                            {/* Meta row (distance, altitude, accommodation) */}
+                                                            {meta.length > 0 && (
+                                                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500 mt-1">
+                                                                    {meta.map((m, i) => (
+                                                                        <span
+                                                                            key={i}
+                                                                            className="inline-flex items-center gap-1.5"
+                                                                        >
+                                                                            {m.icon}
+                                                                            {m.text}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
 
-                                                    {day.accommodation && (
-                                                        <div className="rounded-xl bg-[#f7f5ef] p-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <Hotel size={16} className="text-[#c99b52]" />
-                                                                <span className="text-xs font-semibold uppercase tracking-wider text-[#8a8d94]">
-                                                                    Accommodation
+                                                        {/* Chevron */}
+                                                        <div className="flex-shrink-0 pt-2.5">
+                                                            <ChevronDown className="w-4 h-4 text-gray-400 transition-transform duration-200 group-open:rotate-180" />
+                                                        </div>
+                                                    </summary>
+
+                                                    {/* Expanded body */}
+                                                    <div className="pl-14 pr-1 pb-5">
+                                                        {day.description && (
+                                                            <p className="text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+                                                                {day.description}
+                                                            </p>
+                                                        )}
+
+                                                        {meals.length > 0 && (
+                                                            <div className="flex flex-wrap gap-4 text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
+                                                                <span className="uppercase tracking-wide text-[10px] font-semibold text-gray-400">
+                                                                    Meals
                                                                 </span>
+                                                                {meals.map((m, i) => (
+                                                                    <span
+                                                                        key={i}
+                                                                        className="inline-flex items-center gap-1.5"
+                                                                    >
+                                                                        {m.icon}
+                                                                        {m.text}
+                                                                    </span>
+                                                                ))}
                                                             </div>
-
-                                                            <p className="mt-2 text-sm font-medium text-[#18243a]">
-                                                                {day.accommodation}
-                                                            </p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </details>
-                                    ))}
+                                                        )}
+                                                    </div>
+                                                </details>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </section>
+                            </div>
                         )}
                         {/* Simple included list */}
                         {pkg.included?.length > 0 && (
