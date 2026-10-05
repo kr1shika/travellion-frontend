@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 
 import {
-    Calendar, Check, ChevronDown, Clock, Coffee, Compass,
+    Calendar, Check, ChevronDown,
+    ChevronUp,
+    Clock, Coffee, Compass,
     Footprints, Home,
     Mail, MapPin, Moon, Mountain,
     Phone, Users, Utensils, X
@@ -420,112 +422,13 @@ export default function PackageDetail() {
                                 </ul>
                             </Section>
                         )}
-
                         {/* ============================================
     ITINERARY
 ============================================ */}
                         {pkg.itinerary.length > 0 && (
                             <Section title="Itinerary">
-                                <div className="divide-y divide-[#18243a]/8">
-                                    {pkg.itinerary.map((day, idx) => {
-                                        const meta = [
-                                            day.distance && {
-                                                icon: <Footprints className="w-3.5 h-3.5" />,
-                                                text: day.distance,
-                                            },
-                                            day.altitude?.meters && {
-                                                icon: <Mountain className="w-3.5 h-3.5" />,
-                                                text: `${day.altitude.meters} m`,
-                                            },
-                                            day.accommodation && {
-                                                icon: <Home className="w-3.5 h-3.5" />,
-                                                text: day.accommodation,
-                                            },
-                                        ].filter(Boolean);
-
-                                        const meals = [
-                                            day.meals?.breakfast && {
-                                                icon: <Coffee className="w-3.5 h-3.5" />,
-                                                text: "Breakfast",
-                                            },
-                                            day.meals?.lunch && {
-                                                icon: <Utensils className="w-3.5 h-3.5" />,
-                                                text: "Lunch",
-                                            },
-                                            day.meals?.dinner && {
-                                                icon: <Moon className="w-3.5 h-3.5" />,
-                                                text: "Dinner",
-                                            },
-                                        ].filter(Boolean);
-
-                                        return (
-                                            <details
-                                                key={day.id || day.day}
-                                                open={idx === 0}
-                                                className="group"
-                                            >
-                                                <summary className="flex items-center gap-4 cursor-pointer list-none py-4 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
-                                                    {/* Day number badge */}
-                                                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
-                                                        <span className="font-serif text-lg text-[#b18442] leading-none">
-                                                            {String(day.day).padStart(2, "0")}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Title + meta */}
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="font-serif text-lg text-[#101d30] leading-snug">
-                                                            {day.title || `Day ${day.day}`}
-                                                        </p>
-
-                                                        {meta.length > 0 && (
-                                                            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#18243a]/50 mt-1.5 [&>span>svg]:text-[#c99b52]/70">
-                                                                {meta.map((m, i) => (
-                                                                    <span
-                                                                        key={i}
-                                                                        className="inline-flex items-center gap-1.5"
-                                                                    >
-                                                                        {m.icon}
-                                                                        {m.text}
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Chevron */}
-                                                    <ChevronDown className="w-5 h-5 text-[#18243a]/40 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
-                                                </summary>
-
-                                                {/* Expanded content */}
-                                                <div className="pl-16 pr-2 pb-5 pt-1">
-                                                    {day.description && (
-                                                        <p className="text-[#18243a]/70 whitespace-pre-line text-sm leading-relaxed">
-                                                            {day.description}
-                                                        </p>
-                                                    )}
-
-                                                    {meals.length > 0 && (
-                                                        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-[#18243a]/55 mt-4 pt-4 border-t border-[#18243a]/8">
-                                                            <span className="uppercase tracking-[0.12em] text-[10px] font-semibold text-[#b18442]">
-                                                                Meals
-                                                            </span>
-                                                            {meals.map((m, i) => (
-                                                                <span
-                                                                    key={i}
-                                                                    className="inline-flex items-center gap-1.5 [&>svg]:text-[#c99b52]/70"
-                                                                >
-                                                                    {m.icon}
-                                                                    {m.text}
-                                                                </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </details>
-                                        );
-                                    })}
-                                </div>
+                                {/* Full timeline — collapsed when "showAll" is false */}
+                                <ItineraryList itinerary={pkg.itinerary} />
                             </Section>
                         )}
                         {/* Simple included list */}
@@ -817,5 +720,152 @@ function SidebarFact({ icon, label, value }) {
                 {value}
             </span>
         </div>
+    );
+}
+// ============================================
+// ITINERARY LIST — with expand/collapse
+// ============================================
+function ItineraryList({ itinerary }) {
+    const PREVIEW_COUNT = 5;
+    const [showAll, setShowAll] = useState(false);
+
+    const visible = showAll
+        ? itinerary
+        : itinerary.slice(0, PREVIEW_COUNT);
+
+    const hiddenCount = itinerary.length - PREVIEW_COUNT;
+
+    return (
+        <>
+            <div className="divide-y divide-[#18243a]/8">
+                {visible.map((day, idx) => {
+                    const meta = [
+                        day.distance && {
+                            icon: <Footprints className="w-3.5 h-3.5" />,
+                            text: day.distance,
+                        },
+                        day.altitude?.meters && {
+                            icon: <Mountain className="w-3.5 h-3.5" />,
+                            text: `${day.altitude.meters} m`,
+                        },
+                        day.accommodation && {
+                            icon: <Home className="w-3.5 h-3.5" />,
+                            text: day.accommodation,
+                        },
+                    ].filter(Boolean);
+
+                    const meals = [
+                        day.meals?.breakfast && {
+                            icon: <Coffee className="w-3.5 h-3.5" />,
+                            text: "Breakfast",
+                        },
+                        day.meals?.lunch && {
+                            icon: <Utensils className="w-3.5 h-3.5" />,
+                            text: "Lunch",
+                        },
+                        day.meals?.dinner && {
+                            icon: <Moon className="w-3.5 h-3.5" />,
+                            text: "Dinner",
+                        },
+                    ].filter(Boolean);
+
+                    return (
+                        <details
+                            key={day.id || day.day}
+                            open={idx === 0 && !showAll ? false : idx === 0}
+                            className="group"
+                        >
+                            <summary className="flex items-center gap-4 cursor-pointer list-none py-4 px-1 hover:bg-[#faf9f5] rounded-lg transition-colors">
+                                {/* Day number badge */}
+                                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-[#c99b52]/10 flex items-center justify-center">
+                                    <span className="font-serif text-lg text-[#b18442] leading-none">
+                                        {String(day.day).padStart(2, "0")}
+                                    </span>
+                                </div>
+
+                                {/* Title + meta */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-serif text-lg text-[#101d30] leading-snug">
+                                        {day.title || `Day ${day.day}`}
+                                    </p>
+
+                                    {meta.length > 0 && (
+                                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-[#18243a]/50 mt-1.5 [&>span>svg]:text-[#c99b52]/70">
+                                            {meta.map((m, i) => (
+                                                <span
+                                                    key={i}
+                                                    className="inline-flex items-center gap-1.5"
+                                                >
+                                                    {m.icon}
+                                                    {m.text}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Chevron */}
+                                <ChevronDown className="w-5 h-5 text-[#18243a]/40 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
+                            </summary>
+
+                            {/* Expanded content */}
+                            <div className="pl-16 pr-2 pb-5 pt-1">
+                                {day.description && (
+                                    <p className="text-[#18243a]/70 whitespace-pre-line text-sm leading-relaxed">
+                                        {day.description}
+                                    </p>
+                                )}
+
+                                {meals.length > 0 && (
+                                    <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-[#18243a]/55 mt-4 pt-4 border-t border-[#18243a]/8">
+                                        <span className="uppercase tracking-[0.12em] text-[10px] font-semibold text-[#b18442]">
+                                            Meals
+                                        </span>
+                                        {meals.map((m, i) => (
+                                            <span
+                                                key={i}
+                                                className="inline-flex items-center gap-1.5 [&>svg]:text-[#c99b52]/70"
+                                            >
+                                                {m.icon}
+                                                {m.text}
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </details>
+                    );
+                })}
+            </div>
+
+            {/* Expand / collapse toggle */}
+            {itinerary.length > PREVIEW_COUNT && (
+                <div className="mt-6 pt-6 border-t border-[#18243a]/8 text-center">
+                    <button
+                        type="button"
+                        onClick={() => setShowAll((s) => !s)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#18243a]/15 px-6 py-3 text-sm font-semibold text-[#18243a]/70 hover:bg-[#faf9f5] hover:border-[#c99b52]/40 hover:text-[#b18442] transition-colors"
+                    >
+                        {showAll ? (
+                            <>
+                                Show less
+                                <ChevronUp className="w-4 h-4" />
+                            </>
+                        ) : (
+                            <>
+                                View all {itinerary.length} days
+                                <ChevronDown className="w-4 h-4" />
+                            </>
+                        )}
+                    </button>
+
+                    {!showAll && hiddenCount > 0 && (
+                        <p className="text-xs text-[#18243a]/45 mt-3">
+                            {hiddenCount} more day{hiddenCount !== 1 && "s"} hidden
+                        </p>
+                    )}
+                </div>
+            )}
+        </>
     );
 }
