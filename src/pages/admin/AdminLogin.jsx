@@ -36,7 +36,7 @@ export default function AdminLogin() {
             localStorage.setItem("adminToken", data.data.token);
             localStorage.setItem("admin", JSON.stringify(data.data.admin));
 
-            navigate("/admin/dashboard");
+            navigate("/manage9x7k2/dashboard");
         } catch (err) {
             setError(err.message);
         } finally {

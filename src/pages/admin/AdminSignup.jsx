@@ -74,7 +74,7 @@ export default function AdminSignup() {
             });
 
             setTimeout(() => {
-                navigate("/admin/login");
+                navigate("/manage9x7k2/login");
             }, 1500);
 
         } catch (error) {

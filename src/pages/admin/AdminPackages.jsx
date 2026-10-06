@@ -72,7 +72,7 @@ export default function AdminPackages() {
                 </div>
 
                 <Link
-                    to="/admin/packages/new"
+                    to="/manage9x7k2/packages/new"
                     className="rounded-lg bg-slate-950 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800"
                 >
                     + New Package
@@ -92,7 +92,7 @@ export default function AdminPackages() {
                 <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
                     <p className="text-slate-500">No packages yet.</p>
                     <Link
-                        to="/admin/packages/new"
+                        to="/manage9x7k2/packages/new"
                         className="mt-4 inline-block text-sm font-semibold text-slate-900 underline"
                     >
                         Create your first package
@@ -164,13 +164,13 @@ export default function AdminPackages() {
                                     </td>
                                     <td className="px-6 py-4 text-right space-x-3">
                                         <Link
-                                            to={`/admin/packages/edit/${pkg.id || pkg._id}`}
+                                            to={`/manage9x7k2/packages/edit/${pkg.id || pkg._id}`}
                                             className="text-sm font-semibold text-slate-700 hover:text-slate-900"
                                         >
                                             Edit
                                         </Link>
                                         <Link
-                                            to={`/admin/itineraries/${pkg._id}`}
+                                            to={`/manage9x7k2/itineraries/${pkg._id}`}
                                             className="text-sm font-semibold text-slate-700 hover:text-slate-900"
                                         >
                                             Itinerary
