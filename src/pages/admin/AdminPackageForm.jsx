@@ -470,7 +470,7 @@ export default function AdminPackageForm() {
                         className="rounded-lg bg-slate-950 px-6 py-3 text-white font-semibold hover:bg-slate-800 disabled:opacity-60">
                         {saving ? "Saving..." : isEdit ? "Update Package" : "Create Package"}
                     </button>
-                    <button type="button" onClick={() => navigate("/admin/packages")}
+                    <button type="button" onClick={() => navigate("/manage9x7k2/packages")}
                         className="rounded-lg border border-slate-300 px-6 py-3 text-slate-700">
                         Cancel
                     </button>
