@@ -184,7 +184,7 @@ export default function AdminItineraryForm() {
             setSuccess("Itinerary saved successfully");
 
             setTimeout(() => {
-                navigate("/admin/itineraries");
+                navigate("/manage9x7k2/itineraries");
             }, 800);
         } catch (err) {
             setError(err.message);
@@ -205,7 +205,7 @@ export default function AdminItineraryForm() {
             <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
                 <p className="text-slate-500">Package not found.</p>
                 <Link
-                    to="/admin/itineraries"
+                    to="/manage9x7k2/itineraries"
                     className="mt-4 inline-block text-sm font-semibold text-slate-900 underline"
                 >
                     Back to itineraries
@@ -222,7 +222,7 @@ export default function AdminItineraryForm() {
             {/* Header */}
             <div className="mb-6">
                 <Link
-                    to="/admin/itineraries"
+                    to="/manage9x7k2/itineraries"
                     className="text-sm text-slate-500 hover:text-slate-900"
                 >
                     ← Back to itineraries
@@ -472,7 +472,7 @@ export default function AdminItineraryForm() {
                 </button>
                 <button
                     type="button"
-                    onClick={() => navigate("/admin/itineraries")}
+                    onClick={() => navigate("/manage9x7k2/itineraries")}
                     className="rounded-lg border border-slate-300 px-6 py-3 text-slate-700"
                 >
                     Cancel

@@ -39,7 +39,7 @@ export default function AdminSignup() {
         try {
 
             const response = await fetch(
-                `${API_URL}/admins`,
+                `${API_URL}/manage9x7k2`,
                 {
                     method: "POST",
 

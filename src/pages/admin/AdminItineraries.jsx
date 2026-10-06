@@ -11,7 +11,7 @@ export default function AdminItineraries() {
         (async () => {
             try {
                 setLoading(true);
-                const { data } = await adminFetch("/packages/admin/all?limit=100");
+                const { data } = await adminFetch("/packages/manage9x7k2/all?limit=100");
                 if (data.success) setPackages(data.data);
             } catch (err) {
                 setError(err.message);
@@ -49,7 +49,7 @@ export default function AdminItineraries() {
                         No packages yet. Create a package first.
                     </p>
                     <Link
-                        to="/admin/packages/new"
+                        to="/manage9x7k2/packages/new"
                         className="mt-4 inline-block text-sm font-semibold text-slate-900 underline"
                     >
                         Create package
@@ -133,10 +133,10 @@ export default function AdminItineraries() {
                                         {/* Action */}
                                         <td className="px-6 py-4 text-right">
                                             <Link
-                                                to={`/admin/itineraries/${pkg._id}`}
+                                                to={`/manage9x7k2/itineraries/${pkg._id}`}
                                                 className={`rounded-lg px-4 py-2 text-sm font-semibold ${hasItinerary
-                                                        ? "bg-slate-100 text-slate-900 hover:bg-slate-200"
-                                                        : "bg-slate-950 text-white hover:bg-slate-800"
+                                                    ? "bg-slate-100 text-slate-900 hover:bg-slate-200"
+                                                    : "bg-slate-950 text-white hover:bg-slate-800"
                                                     }`}
                                             >
                                                 {hasItinerary ? "Edit Itinerary" : "+ Add Itinerary"}

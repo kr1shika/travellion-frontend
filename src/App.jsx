@@ -41,22 +41,22 @@ function App() {
             {/* ============================================
             ADMIN AUTH
         ============================================ */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin/signup" element={<AdminSignup />} />
+            <Route path="/manage9x7k2/login" element={<AdminLogin />} />
+            <Route path="/manage9x7k2/signup" element={<AdminSignup />} />
 
             {/* ============================================
             PROTECTED ADMIN AREA
             (all children use RELATIVE paths)
         ============================================ */}
             <Route
-              path="/admin"
+              path="/manage9x7k2"
               element={
                 <AdminProtectedRoute>
                   <AdminLayout />
                 </AdminProtectedRoute>
               }
             >
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route index element={<Navigate to="/manage9x7k2/dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="packages" element={<AdminPackages />} />
               <Route path="packages/new" element={<AdminPackageForm />} />

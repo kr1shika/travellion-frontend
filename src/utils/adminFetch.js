@@ -16,7 +16,7 @@ export const adminFetch = async (endpoint, options = {}) => {
         // Token expired or invalid — force re-login
         localStorage.removeItem('adminToken');
         localStorage.removeItem('admin');
-        window.location.href = '/admin/login';
+        window.location.href = '/manage9x7k2/login';
         throw new Error('Session expired. Please log in again.');
     }
 

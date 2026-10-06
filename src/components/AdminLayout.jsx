@@ -7,7 +7,7 @@ export default function AdminLayout() {
     const logout = () => {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("admin");
-        navigate("/admin/login");
+        navigate("/manage9x7k2/login");
     };
 
     return (
@@ -29,12 +29,12 @@ export default function AdminLayout() {
                 </div>
 
                 <nav className="p-4 space-y-1 flex-1">
-                    <NavItem to="/admin/dashboard">Dashboard</NavItem>
-                    <NavItem to="/admin/packages">Packages</NavItem>
-                    <NavItem to="/admin/itineraries">Itineraries</NavItem>
-                    <NavItem to="/admin/bookings">Bookings</NavItem>
-                    <NavItem to="/admin/customers">Customers</NavItem>
-                    <NavItem to="/admin/inquiries">Inquiries</NavItem>
+                    <NavItem to="/manage9x7k2/dashboard">Dashboard</NavItem>
+                    <NavItem to="/manage9x7k2/packages">Packages</NavItem>
+                    <NavItem to="/manage9x7k2/itineraries">Itineraries</NavItem>
+                    <NavItem to="/manage9x7k2/bookings">Bookings</NavItem>
+                    <NavItem to="/manage9x7k2/customers">Customers</NavItem>
+                    <NavItem to="/manage9x7k2/inquiries">Inquiries</NavItem>
                 </nav>
 
                 <div className="p-4 border-t border-slate-800">
@@ -82,10 +82,9 @@ function NavItem({ to, children }) {
         <NavLink
             to={to}
             className={({ isActive }) =>
-                `block rounded-lg px-4 py-3 text-sm font-medium transition ${
-                    isActive
-                        ? "bg-slate-800 text-white"
-                        : "text-slate-300 hover:bg-slate-800"
+                `block rounded-lg px-4 py-3 text-sm font-medium transition ${isActive
+                    ? "bg-slate-800 text-white"
+                    : "text-slate-300 hover:bg-slate-800"
                 }`
             }
         >

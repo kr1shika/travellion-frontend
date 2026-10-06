@@ -251,7 +251,7 @@ export default function AdminPackageForm() {
 
             if (!data.success) throw new Error(data.message);
 
-            navigate("/admin/packages");
+            navigate("/manage9x7k2/packages");
         } catch (err) {
             setError(err.message);
         } finally {

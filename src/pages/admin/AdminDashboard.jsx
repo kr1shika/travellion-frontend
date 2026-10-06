@@ -51,25 +51,25 @@ export default function AdminDashboard() {
                     title="Packages"
                     value={stats.packages.total}
                     description={`${stats.packages.published} published · ${stats.packages.draft} draft`}
-                    href="/admin/packages"
+                    href="/manage9x7k2/packages"
                 />
                 <StatCard
                     title="Bookings"
                     value={stats.bookings.total}
                     description={`${stats.bookings.pending} pending · ${stats.bookings.confirmed} confirmed`}
-                    href="/admin/bookings"
+                    href="/manage9x7k2/bookings"
                 />
                 <StatCard
                     title="Customers"
                     value={stats.customers.total}
                     description={`${stats.customers.active} active`}
-                    href="/admin/customers"
+                    href="/manage9x7k2/customers"
                 />
                 <StatCard
                     title="Inquiries"
                     value={stats.inquiries.total}
                     description={`${stats.inquiries.new} new · ${stats.inquiries.inProgress} in progress`}
-                    href="/admin/inquiries"
+                    href="/manage9x7k2/inquiries"
                 />
             </div>
 
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
                     </p>
 
                     <Link
-                        to="/admin/bookings"
+                        to="/manage9x7k2/bookings"
                         className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-slate-700 hover:text-slate-900"
                     >
                         View bookings
@@ -117,7 +117,7 @@ export default function AdminDashboard() {
                             Recent Bookings
                         </h3>
                         <Link
-                            to="/admin/bookings"
+                            to="/manage9x7k2/bookings"
                             className="text-xs font-semibold text-slate-500 hover:text-slate-900"
                         >
                             View all
